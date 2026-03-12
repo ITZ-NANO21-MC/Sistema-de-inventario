@@ -1,3 +1,4 @@
+<!-- app/templates/producto/listar.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -14,6 +15,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
+                <th>Descripción</th>   <!-- Nueva columna -->
                 <th>Categoría</th>
                 <th>Stock</th>
                 <th>Stock Mínimo</th>
@@ -26,6 +28,13 @@
             <tr>
                 <td>{{ producto.id }}</td>
                 <td>{{ producto.nombre }}</td>
+                <td>
+                    {% if producto.descripcion %}
+                        <span title="{{ producto.descripcion }}">{{ producto.descripcion[:30] }}{% if producto.descripcion|length > 30 %}...{% endif %}</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td>{{ producto.categoria }}</td>
                 <td>
                     <span class="badge {% if producto.cantidad_stock < producto.stock_minimo %}bg-danger{% else %}bg-success{% endif %}">
@@ -47,7 +56,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" class="text-center">No hay productos registrados.</td>
+                <td colspan="8" class="text-center">No hay productos registrados.</td>  <!-- colspan actualizado -->
             </tr>
             {% endfor %}
         </tbody>

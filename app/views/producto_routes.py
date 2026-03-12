@@ -16,6 +16,7 @@ def crear():
     if form.validate_on_submit():
         data = {
             'nombre': form.nombre.data,
+            'descripcion': form.descripcion.data,
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,
             'stock_minimo': form.stock_minimo.data,
@@ -37,6 +38,7 @@ def editar(id):
     if form.validate_on_submit():
         data = {
             'nombre': form.nombre.data,
+            'descripcion': form.descripcion.data,
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,
             'stock_minimo': form.stock_minimo.data,

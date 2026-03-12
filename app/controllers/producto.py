@@ -15,6 +15,7 @@ class ProductoController:
     def crear(data: dict) -> Producto:
         producto = Producto(
             nombre=data['nombre'],
+            descripcion=data.get('descripcion', ''),  # Nuevo campo
             categoria=data['categoria'],
             cantidad_stock=data['cantidad_stock'],
             stock_minimo=data['stock_minimo'],
@@ -30,6 +31,7 @@ class ProductoController:
         if not producto:
             return None
         producto.nombre = data['nombre']
+        producto.descripcion = data.get('descripcion', '')  # Nuevo campo
         producto.categoria = data['categoria']
         producto.cantidad_stock = data['cantidad_stock']
         producto.stock_minimo = data['stock_minimo']

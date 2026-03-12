@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SelectField, SubmitField
-from wtforms.validators import DataRequired, NumberRange, Optional, Length
+from wtforms import StringField, IntegerField, SelectField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, NumberRange, Optional, Length 
 
 # Definición del formulario
 class ProductoForm(FlaskForm):
     nombre = StringField('Nombre', validators=[DataRequired(), Length(max=100)])
+    descripcion = TextAreaField('Descripción', validators=[Optional(), Length(max=200)])
     categoria = SelectField('Categoría', choices=[
         ('pantalla', 'Pantalla'),
         ('bateria', 'Batería'),

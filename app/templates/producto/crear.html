@@ -1,3 +1,4 @@
+<!-- app/templates/producto/crear.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -15,6 +16,15 @@
                         {{ form.nombre.label(class="form-label") }}
                         {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else "")) }}
                         {% for error in form.nombre.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Nuevo campo descripción -->
+                    <div class="mb-3">
+                        {{ form.descripcion.label(class="form-label") }}
+                        {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""), rows=3) }}
+                        {% for error in form.descripcion.errors %}
                             <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
                     </div>

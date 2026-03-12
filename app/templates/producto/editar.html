@@ -19,6 +19,15 @@
                         {% endfor %}
                     </div>
 
+                    <!-- Nuevo campo descripción -->
+                    <div class="mb-3">
+                        {{ form.descripcion.label(class="form-label") }}
+                        {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""), rows=3) }}
+                        {% for error in form.descripcion.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
                     <div class="mb-3">
                         {{ form.categoria.label(class="form-label") }}
                         {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else "")) }}
