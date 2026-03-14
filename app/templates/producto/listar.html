@@ -1,4 +1,3 @@
-<!-- app/templates/producto/listar.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -15,7 +14,8 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Descripción</th>   <!-- Nueva columna -->
+                <th>Descripción</th>
+                <th>Compatibilidad</th>
                 <th>Categoría</th>
                 <th>Stock</th>
                 <th>Stock Mínimo</th>
@@ -31,6 +31,15 @@
                 <td>
                     {% if producto.descripcion %}
                         <span title="{{ producto.descripcion }}">{{ producto.descripcion[:30] }}{% if producto.descripcion|length > 30 %}...{% endif %}</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if producto.categoria == 'pantalla' and producto.modelos_compatibles %}
+                        <span class="badge bg-info" title="{{ producto.modelos_compatibles|map(attribute='nombre')|join(', ') }}">
+                            {{ producto.modelos_compatibles|length }} modelo(s)
+                        </span>
                     {% else %}
                         -
                     {% endif %}
@@ -56,7 +65,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="8" class="text-center">No hay productos registrados.</td>  <!-- colspan actualizado -->
+                <td colspan="9" class="text-center">No hay productos registrados.</td>
             </tr>
             {% endfor %}
         </tbody>

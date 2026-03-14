@@ -10,7 +10,7 @@
             <div class="card-body">
                 <form method="POST" action="{{ url_for('producto.editar', id=producto.id) }}" novalidate>
                     {{ form.hidden_tag() }}
-                    <!-- mismos campos que en crear.html -->
+
                     <div class="mb-3">
                         {{ form.nombre.label(class="form-label") }}
                         {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else "")) }}
@@ -19,7 +19,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Nuevo campo descripción -->
                     <div class="mb-3">
                         {{ form.descripcion.label(class="form-label") }}
                         {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""), rows=3) }}
@@ -30,10 +29,19 @@
 
                     <div class="mb-3">
                         {{ form.categoria.label(class="form-label") }}
-                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else "")) }}
+                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else ""), id="categoria") }}
                         {% for error in form.categoria.errors %}
                             <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
+                    </div>
+
+                    <!-- Campo de modelos compatibles -->
+                    <div class="mb-3" id="modelos-field">
+                        {{ form.modelos_compatibles.label(class="form-label") }}
+                        <div class="border p-3 rounded">
+                            {{ form.modelos_compatibles() }}
+                        </div>
+                        <small class="text-muted">Selecciona todos los modelos compatibles</small>
                     </div>
 
                     <div class="row">

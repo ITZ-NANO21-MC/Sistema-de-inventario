@@ -1,4 +1,3 @@
-<!-- app/templates/producto/crear.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -20,7 +19,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Nuevo campo descripción -->
                     <div class="mb-3">
                         {{ form.descripcion.label(class="form-label") }}
                         {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""), rows=3) }}
@@ -31,10 +29,19 @@
 
                     <div class="mb-3">
                         {{ form.categoria.label(class="form-label") }}
-                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else "")) }}
+                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else ""), id="categoria") }}
                         {% for error in form.categoria.errors %}
                             <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
+                    </div>
+
+                    <!-- Campo de modelos compatibles (visible solo para pantallas) -->
+                    <div class="mb-3" id="modelos-field">
+                        {{ form.modelos_compatibles.label(class="form-label") }}
+                        <div class="border p-3 rounded">
+                            {{ form.modelos_compatibles() }}
+                        </div>
+                        <small class="text-muted">Selecciona todos los modelos compatibles</small>
                     </div>
 
                     <div class="row">
@@ -71,4 +78,24 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoriaSelect = document.getElementById('categoria');
+    const modelosField = document.getElementById('modelos-field');
+    const checkboxes = modelosField.querySelectorAll('input[type=checkbox]');
+
+    function toggleModelosField() {
+        if (categoriaSelect.value === 'pantalla') {
+            modelosField.style.display = 'block';
+            checkboxes.forEach(cb => cb.disabled = false);
+        } else {
+            modelosField.style.display = 'none';
+            checkboxes.forEach(cb => cb.disabled = true);
+        }
+    }
+    toggleModelosField();
+    categoriaSelect.addEventListener('change', toggleModelosField);
+});
+</script>
 {% endblock %}

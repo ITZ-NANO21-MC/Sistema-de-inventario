@@ -6,7 +6,7 @@ class Producto(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
-    descripcion = db.Column(db.String(200), nullable=True)  # Nuevo campo
+    descripcion = db.Column(db.String(200), nullable=True)
     categoria = db.Column(db.String(50), nullable=False)
     cantidad_stock = db.Column(db.Integer, default=0)
     stock_minimo = db.Column(db.Integer, default=5)
@@ -14,5 +14,29 @@ class Producto(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # Relación muchos a muchos con modelos de teléfono
+    modelos_compatibles = db.relationship('ModeloTelefono', secondary='compatibilidad',
+                                          back_populates='productos')
+
     def __repr__(self):
         return f'<Producto {self.nombre}>'
+
+
+class ModeloTelefono(db.Model):
+    __tablename__ = 'modelos_telefono'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)
+
+    productos = db.relationship('Producto', secondary='compatibilidad',
+                                back_populates='modelos_compatibles')
+
+    def __repr__(self):
+        return f'<Modelo {self.nombre}>'
+
+
+class Compatibilidad(db.Model):
+    __tablename__ = 'compatibilidad'
+
+    producto_id = db.Column(db.Integer, db.ForeignKey('productos.id'), primary_key=True)
+    modelo_id = db.Column(db.Integer, db.ForeignKey('modelos_telefono.id'), primary_key=True)

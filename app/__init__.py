@@ -15,7 +15,10 @@ def create_app(config_class=Config):
 
     # Registro de blueprints
     from app.views.producto_routes import producto_bp
+    from app.views.modelo_routes import modelo_bp
+
     app.register_blueprint(producto_bp, url_prefix='/productos')
+    app.register_blueprint(modelo_bp, url_prefix='/modelos')
 
     # Ruta raíz redirige a lista de productos
     @app.route('/')

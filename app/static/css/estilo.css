@@ -2,3 +2,16 @@
 body {
     background-color: #f8f9fa;
 }
+
+#modelos-field ul {
+    list-style: none;
+    padding-left: 0;
+}
+#modelos-field li {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 5px;
+}
+#modelos-field input[type=checkbox] {
+    margin-right: 5px;
+}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Modelos de Teléfono</h2>
+    <a href="{{ url_for('modelo.crear') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nuevo Modelo
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for modelo in modelos %}
+            <tr>
+                <td>{{ modelo.id }}</td>
+                <td>{{ modelo.nombre }}</td>
+                <td>
+                    <a href="{{ url_for('modelo.editar', id=modelo.id) }}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{{ url_for('modelo.eliminar', id=modelo.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este modelo?');">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="text-center">No hay modelos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
