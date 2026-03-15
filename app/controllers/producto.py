@@ -2,6 +2,21 @@ from sqlalchemy.orm import joinedload
 from app.models import Producto, ModeloTelefono
 from app import db
 from typing import Optional, List
+from flask import current_app
+
+
+def verificar_stock_y_notificar(app):
+    """Función que consulta todos los productos y verifica si alguno tiene
+    un stock menor o igual al mínimo. Si los hay, envía un correo."""
+    with app.app_context():
+        productos_bajos = Producto.query.filter(Producto.cantidad_stock <= Producto.stock_minimo).all()
+        
+        if productos_bajos:
+            app.logger.info(f"Se encontraron {len(productos_bajos)} productos con stock bajo. Enviando alerta...")
+            from app.services.alertas import enviar_alerta_email
+            enviar_alerta_email(app, productos_bajos)
+        else:
+            app.logger.info("Stock verificado: Todos los productos tienen niveles adecuados.")
 
 class ProductoController:
     @staticmethod
@@ -27,6 +42,10 @@ class ProductoController:
             producto.modelos_compatibles = modelos
         db.session.add(producto)
         db.session.commit()
+        
+        if producto.cantidad_stock <= producto.stock_minimo:
+            verificar_stock_y_notificar(current_app._get_current_object())
+        
         return producto
 
     @staticmethod
@@ -49,6 +68,10 @@ class ProductoController:
 
         db.session.commit()
         print(f"[DEPURACIÓN] Producto {id} guardado. Modelos compatibles ahora: {[m.nombre for m in producto.modelos_compatibles]}")
+        
+        if producto.cantidad_stock <= producto.stock_minimo:
+            verificar_stock_y_notificar(current_app._get_current_object())
+        
         db.session.expire(producto)
         return producto
 
