@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from app.controllers.producto import ProductoController
 from app.forms import ProductoForm
+from app.services.alertas import verificar_stock_y_notificar
 
 producto_bp = Blueprint('producto', __name__, template_folder='../templates/producto')
 
@@ -72,4 +73,15 @@ def eliminar(id):
         flash('Producto eliminado', 'success')
     else:
         flash('Error al eliminar el producto', 'danger')
+    return redirect(url_for('producto.listar'))
+
+@producto_bp.route('/enviar-alerta-manual')
+def enviar_alerta_manual():
+    """Envía manualmente una alerta de stock bajo por email."""
+    try:
+        verificar_stock_y_notificar(current_app._get_current_object())
+        flash('Alerta de stock bajo enviada exitosamente', 'success')
+    except Exception as e:
+        flash(f'Error al enviar la alerta: {str(e)}', 'danger')
+        current_app.logger.error(f"Error en envío manual de alerta: {str(e)}")
     return redirect(url_for('producto.listar'))
