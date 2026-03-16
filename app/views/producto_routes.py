@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from app.controllers.producto import ProductoController
 from app.forms import ProductoForm
 from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
+from app import db
 from config import Config
 
 producto_bp = Blueprint('producto', __name__, template_folder='../templates/producto')
@@ -11,8 +12,42 @@ def get_tasa_cambio():
 
 @producto_bp.route('/')
 def listar():
-    productos = ProductoController.obtener_todos()
-    return render_template('listar.html', productos=productos)
+    from app.models import Producto
+    
+    # Obtener parámetros de búsqueda
+    busqueda = request.args.get('busqueda', '').strip()
+    categoria = request.args.get('categoria', '').strip()
+    precio_min = request.args.get('precio_min', type=float)
+    precio_max = request.args.get('precio_max', type=float)
+    precio_min_usd = request.args.get('precio_min_usd', type=float)
+    precio_max_usd = request.args.get('precio_max_usd', type=float)
+    proveedor = request.args.get('proveedor', '').strip()
+    stock_bajo = request.args.get('stock_bajo', '').strip()
+    stock_minimo = request.args.get('stock_minimo', type=int)
+    stock_maximo = request.args.get('stock_maximo', type=int)
+    
+    # Verificar si hay filtros activos
+    if busqueda or categoria or precio_min or precio_max or precio_min_usd or precio_max_usd or proveedor or stock_bajo or stock_minimo or stock_maximo:
+        productos = ProductoController.obtener_con_filtros(
+            busqueda=busqueda if busqueda else None,
+            categoria=categoria if categoria else None,
+            precio_min=precio_min,
+            precio_max=precio_max,
+            precio_min_usd=precio_min_usd,
+            precio_max_usd=precio_max_usd,
+            proveedor=proveedor if proveedor else None,
+            stock_bajo=stock_bajo if stock_bajo else None,
+            stock_minimo=stock_minimo,
+            stock_maximo=stock_maximo
+        )
+    else:
+        productos = ProductoController.obtener_todos()
+    
+    # Obtener categorías únicas para el filtro
+    categorias = db.session.query(Producto.categoria).distinct().all()
+    categorias = [c[0] for c in categorias]
+    
+    return render_template('listar.html', productos=productos, categorias=categorias)
 
 @producto_bp.route('/crear', methods=['GET', 'POST'])
 def crear():

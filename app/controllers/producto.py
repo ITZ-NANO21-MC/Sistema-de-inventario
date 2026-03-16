@@ -24,6 +24,50 @@ class ProductoController:
         return Producto.query.options(joinedload(Producto.modelos_compatibles)).order_by(Producto.nombre).all()
 
     @staticmethod
+    def obtener_con_filtros(busqueda=None, categoria=None, precio_min=None, precio_max=None, 
+                            precio_min_usd=None, precio_max_usd=None,
+                            proveedor=None, stock_bajo=None, stock_minimo=None, stock_maximo=None) -> List[Producto]:
+        query = Producto.query.options(joinedload(Producto.modelos_compatibles))
+        
+        # Filtro por nombre (búsqueda)
+        if busqueda:
+            query = query.filter(Producto.nombre.ilike(f'%{busqueda}%'))
+        
+        # Filtro por categoría
+        if categoria:
+            query = query.filter(Producto.categoria == categoria)
+        
+        # Filtro por precio mayor (Bs)
+        if precio_min is not None:
+            query = query.filter(Producto.precio_mayor_bs >= precio_min)
+        if precio_max is not None:
+            query = query.filter(Producto.precio_mayor_bs <= precio_max)
+        
+        # Filtro por precio mayor (USD)
+        if precio_min_usd is not None:
+            query = query.filter(Producto.precio_mayor_usd >= precio_min_usd)
+        if precio_max_usd is not None:
+            query = query.filter(Producto.precio_mayor_usd <= precio_max_usd)
+        
+        # Filtro por proveedor
+        if proveedor:
+            query = query.filter(Producto.proveedor.ilike(f'%{proveedor}%'))
+        
+        # Filtro por stock bajo/adecuado
+        if stock_bajo == 'si':
+            query = query.filter(Producto.cantidad_stock <= Producto.stock_minimo)
+        elif stock_bajo == 'no':
+            query = query.filter(Producto.cantidad_stock > Producto.stock_minimo)
+        
+        # Filtro por rango de stock
+        if stock_minimo is not None:
+            query = query.filter(Producto.cantidad_stock >= stock_minimo)
+        if stock_maximo is not None:
+            query = query.filter(Producto.cantidad_stock <= stock_maximo)
+        
+        return query.order_by(Producto.nombre).all()
+
+    @staticmethod
     def obtener_por_id(id: int) -> Optional[Producto]:
         return Producto.query.options(joinedload(Producto.modelos_compatibles)).filter(Producto.id == id).first()
 
