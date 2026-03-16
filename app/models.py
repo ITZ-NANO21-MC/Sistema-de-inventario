@@ -13,6 +13,7 @@ class Producto(db.Model):
     proveedor = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    ultima_notificacion = db.Column(db.DateTime, nullable=True)
 
     # Relación muchos a muchos con modelos de teléfono
     modelos_compatibles = db.relationship('ModeloTelefono', secondary='compatibilidad',
@@ -40,3 +41,12 @@ class Compatibilidad(db.Model):
 
     producto_id = db.Column(db.Integer, db.ForeignKey('productos.id'), primary_key=True)
     modelo_id = db.Column(db.Integer, db.ForeignKey('modelos_telefono.id'), primary_key=True)
+
+
+class ConfiguracionSistema(db.Model):
+    __tablename__ = 'configuracion_sistema'
+
+    id = db.Column(db.Integer, primary_key=True)
+    clave = db.Column(db.String(50), unique=True, nullable=False)
+    valor = db.Column(db.String(255))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -66,10 +66,24 @@ def create_app(config_class=Config):
     from app.views.producto_routes import producto_bp
     from app.views.modelo_routes import modelo_bp
     from app.views.config_routes import config_bp
+    from app.views.alertas_routes import alertas_bp
 
     app.register_blueprint(producto_bp, url_prefix='/productos')
     app.register_blueprint(modelo_bp, url_prefix='/modelos')
     app.register_blueprint(config_bp)
+    app.register_blueprint(alertas_bp)
+
+    # Context processor para pasar productos_bajos_count a todas las plantillas
+    @app.context_processor
+    def inject_productos_bajos():
+        from app.models import Producto
+        try:
+            count = Producto.query.filter(
+                Producto.cantidad_stock <= Producto.stock_minimo
+            ).count()
+        except:
+            count = 0
+        return dict(productos_bajos_count=count)
 
     # Ruta raíz redirige a lista de productos
     @app.route('/')
