@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from app.controllers.producto import ProductoController
 from app.forms import ProductoForm
-from app.services.alertas import verificar_stock_y_notificar
+from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
 
 producto_bp = Blueprint('producto', __name__, template_folder='../templates/producto')
 
@@ -84,4 +84,15 @@ def enviar_alerta_manual():
     except Exception as e:
         flash(f'Error al enviar la alerta: {str(e)}', 'danger')
         current_app.logger.error(f"Error en envío manual de alerta: {str(e)}")
+    return redirect(url_for('producto.listar'))
+
+@producto_bp.route('/enviar-informe-manual')
+def enviar_informe_manual():
+    """Envía manualmente el informe general de inventario por email."""
+    try:
+        generar_informe_general(current_app._get_current_object())
+        flash('Informe general enviado exitosamente', 'success')
+    except Exception as e:
+        flash(f'Error al enviar el informe: {str(e)}', 'danger')
+        current_app.logger.error(f"Error en envío manual de informe: {str(e)}")
     return redirect(url_for('producto.listar'))

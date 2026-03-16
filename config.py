@@ -19,4 +19,19 @@ class Config:
     # Configuración de Flask-APScheduler
     SCHEDULER_API_ENABLED = True
     
+    # Configuración de Jobs - Alerta Stock Bajo
+    JOB_ALERTA_STOCK_HORA = int(os.environ.get('JOB_ALERTA_STOCK_HORA', 8))
+    JOB_ALERTA_STOCK_MINUTO = int(os.environ.get('JOB_ALERTA_STOCK_MINUTO', 0))
+    JOB_ALERTA_STOCK_ACTIVO = os.environ.get('JOB_ALERTA_STOCK_ACTIVO', 'true').lower() in ['true', '1']
+    
+    # Configuración de Jobs - Informe General Mañana
+    JOB_INFORME_MANANA_HORA = int(os.environ.get('JOB_INFORME_MANANA_HORA', 7))
+    JOB_INFORME_MANANA_MINUTO = int(os.environ.get('JOB_INFORME_MANANA_MINUTO', 0))
+    JOB_INFORME_MANANA_ACTIVO = os.environ.get('JOB_INFORME_MANANA_ACTIVO', 'true').lower() in ['true', '1']
+    
+    # Configuración de Jobs - Informe General Tarde
+    JOB_INFORME_TARDE_HORA = int(os.environ.get('JOB_INFORME_TARDE_HORA', 19))
+    JOB_INFORME_TARDE_MINUTO = int(os.environ.get('JOB_INFORME_TARDE_MINUTO', 0))
+    JOB_INFORME_TARDE_ACTIVO = os.environ.get('JOB_INFORME_TARDE_ACTIVO', 'true').lower() in ['true', '1']
+    
     # Otras configuraciones globales

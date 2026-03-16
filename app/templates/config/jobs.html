@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-cog"></i> Configuración de Jobs
+        </h2>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Nota:</strong> Los cambios en esta configuración se guardan en el archivo <code>.env</code>.
+            Debes <strong>reiniciar la aplicación</strong> para que los cambios surtan efecto.
+        </div>
+        
+        <form action="{{ url_for('config.actualizar_jobs') }}" method="POST">
+            {% for job in jobs %}
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock"></i> {{ job.nombre }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">{{ job.descripcion }}</p>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Hora (0-23)</label>
+                            <input type="number" class="form-control" 
+                                   name="JOB_{{ job.id.split('_')[0]|upper }}_{{ job.id.split('_')[1]|upper }}_HORA" 
+                                   value="{{ job.hora }}" min="0" max="23" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Minuto (0-59)</label>
+                            <input type="number" class="form-control" 
+                                   name="JOB_{{ job.id.split('_')[0]|upper }}_{{ job.id.split('_')[1]|upper }}_MINUTO" 
+                                   value="{{ job.minuto }}" min="0" max="59" required>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-check form-switch mt-4">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="job_{{ job.id }}" 
+                                       name="JOB_{{ job.id.split('_')[0]|upper }}_{{ job.id.split('_')[1]|upper }}_ACTIVO"
+                                       {% if job.activo %}checked{% endif %}>
+                                <label class="form-check-label" for="job_{{ job.id }}">
+                                    Job activo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-save"></i> Guardar Configuración
+                </button>
+                <a href="{{ url_for('producto.listar') }}" class="btn btn-secondary btn-lg ms-2">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

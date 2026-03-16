@@ -21,37 +21,41 @@ def create_app(config_class=Config):
     # Configuración de APScheduler
     scheduler.init_app(app)
     
-    # Programar la alerta de stock bajo (por ejemplo: cada día a las 8 AM)
+    # Programar jobs usando configuración dinámica
     from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
-    # Usando cron para ejecutar diariamente
-    scheduler.add_job(
-        id='alerta_stock_diaria',
-        func=verificar_stock_y_notificar,
-        args=[app],
-        trigger='cron',
-        hour=8,
-        minute=0
-    )
     
-    # Informe general de la mañana - 7:00 AM
-    scheduler.add_job(
-        id='informe_general_manana',
-        func=generar_informe_general,
-        args=[app],
-        trigger='cron',
-        hour=7,
-        minute=0
-    )
+    # Alerta de stock bajo - configurable desde .env
+    if app.config.get('JOB_ALERTA_STOCK_ACTIVO', True):
+        scheduler.add_job(
+            id='alerta_stock_diaria',
+            func=verificar_stock_y_notificar,
+            args=[app],
+            trigger='cron',
+            hour=app.config.get('JOB_ALERTA_STOCK_HORA', 8),
+            minute=app.config.get('JOB_ALERTA_STOCK_MINUTO', 0)
+        )
     
-    # Informe general de la tarde - 7:00 PM
-    scheduler.add_job(
-        id='informe_general_tarde',
-        func=generar_informe_general,
-        args=[app],
-        trigger='cron',
-        hour=19,
-        minute=0
-    )
+    # Informe general de la mañana - configurable desde .env
+    if app.config.get('JOB_INFORME_MANANA_ACTIVO', True):
+        scheduler.add_job(
+            id='informe_general_manana',
+            func=generar_informe_general,
+            args=[app],
+            trigger='cron',
+            hour=app.config.get('JOB_INFORME_MANANA_HORA', 7),
+            minute=app.config.get('JOB_INFORME_MANANA_MINUTO', 0)
+        )
+    
+    # Informe general de la tarde - configurable desde .env
+    if app.config.get('JOB_INFORME_TARDE_ACTIVO', True):
+        scheduler.add_job(
+            id='informe_general_tarde',
+            func=generar_informe_general,
+            args=[app],
+            trigger='cron',
+            hour=app.config.get('JOB_INFORME_TARDE_HORA', 19),
+            minute=app.config.get('JOB_INFORME_TARDE_MINUTO', 0)
+        )
     
     # Ejemplo alternativo de prueba: se ejecutaría cada minuto
     #scheduler.add_job(id='test_alerta', func=verificar_stock_y_notificar, args=[app], trigger='interval', minutes=1)
@@ -61,9 +65,11 @@ def create_app(config_class=Config):
     # Registro de blueprints
     from app.views.producto_routes import producto_bp
     from app.views.modelo_routes import modelo_bp
+    from app.views.config_routes import config_bp
 
     app.register_blueprint(producto_bp, url_prefix='/productos')
     app.register_blueprint(modelo_bp, url_prefix='/modelos')
+    app.register_blueprint(config_bp)
 
     # Ruta raíz redirige a lista de productos
     @app.route('/')
