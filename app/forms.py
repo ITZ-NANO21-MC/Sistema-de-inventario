@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SelectField, TextAreaField, SelectMultipleField
+from wtforms import StringField, IntegerField, SelectField, TextAreaField, SelectMultipleField, DecimalField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional
 from wtforms import widgets
 from app.models import ModeloTelefono
@@ -23,6 +23,12 @@ class ProductoForm(FlaskForm):
     stock_minimo = IntegerField('Stock mínimo', validators=[DataRequired(), NumberRange(min=1)])
     proveedor = StringField('Proveedor', validators=[Optional(), Length(max=100)])
     modelos_compatibles = MultiCheckboxField('Modelos compatibles (solo para pantallas)', coerce=int, validators=[Optional()])
+    
+    # Campos de precio
+    precio_mayor_bs = DecimalField('Precio por mayor (Bs)', validators=[Optional()])
+    precio_mayor_usd = DecimalField('Precio por mayor (USD)', validators=[Optional()])
+    precio_detal_bs = DecimalField('Precio al detal (Bs)', validators=[Optional()])
+    precio_detal_usd = DecimalField('Precio al detal (USD)', validators=[Optional()])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

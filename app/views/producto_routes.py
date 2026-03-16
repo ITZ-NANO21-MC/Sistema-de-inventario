@@ -2,8 +2,12 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from app.controllers.producto import ProductoController
 from app.forms import ProductoForm
 from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
+from config import Config
 
 producto_bp = Blueprint('producto', __name__, template_folder='../templates/producto')
+
+def get_tasa_cambio():
+    return Config.TASA_CAMBIO_USD_BS
 
 @producto_bp.route('/')
 def listar():
@@ -20,13 +24,18 @@ def crear():
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,
             'stock_minimo': form.stock_minimo.data,
-            'proveedor': form.proveedor.data
+            'proveedor': form.proveedor.data,
+            'precio_mayor_bs': form.precio_mayor_bs.data or 0,
+            'precio_mayor_usd': form.precio_mayor_usd.data or 0,
+            'precio_detal_bs': form.precio_detal_bs.data or 0,
+            'precio_detal_usd': form.precio_detal_usd.data or 0
         }
         modelos_ids = form.modelos_compatibles.data if form.categoria.data == 'pantalla' else []
         ProductoController.crear(data, modelos_ids)
         flash('Producto creado exitosamente', 'success')
         return redirect(url_for('producto.listar'))
-    return render_template('crear.html', form=form)
+    tasa = get_tasa_cambio()
+    return render_template('crear.html', form=form, tasa_cambio=tasa)
 
 @producto_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
 def editar(id):
@@ -54,7 +63,11 @@ def editar(id):
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,
             'stock_minimo': form.stock_minimo.data,
-            'proveedor': form.proveedor.data
+            'proveedor': form.proveedor.data,
+            'precio_mayor_bs': form.precio_mayor_bs.data or 0,
+            'precio_mayor_usd': form.precio_mayor_usd.data or 0,
+            'precio_detal_bs': form.precio_detal_bs.data or 0,
+            'precio_detal_usd': form.precio_detal_usd.data or 0
         }
         modelos_ids = form.modelos_compatibles.data if form.categoria.data == 'pantalla' else []
         ProductoController.actualizar(id, data, modelos_ids)
@@ -65,7 +78,8 @@ def editar(id):
             print("=== ERRORES EN FORMULARIO ===")
             print(form.errors)
 
-    return render_template('producto/editar.html', form=form, producto=producto)
+    tasa = get_tasa_cambio()
+    return render_template('producto/editar.html', form=form, producto=producto, tasa_cambio=tasa)
 
 @producto_bp.route('/eliminar/<int:id>', methods=['POST'])
 def eliminar(id):

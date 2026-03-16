@@ -39,7 +39,11 @@ def panel():
             'activo': os.environ.get(f'{prefix}_ACTIVO', 'true').lower() in ['true', '1']
         }
         jobs.append(job_data)
-    return render_template('config/jobs.html', jobs=jobs)
+    
+    # Obtener tasa de cambio
+    tasa_cambio = os.environ.get('TASA_CAMBIO_USD_BS', '0')
+    
+    return render_template('config/jobs.html', jobs=jobs, tasa_cambio=tasa_cambio)
 
 
 @config_bp.route('/configuracion/jobs/actualizar', methods=['POST'])
@@ -63,6 +67,10 @@ def actualizar_jobs():
         update_env_value(env_path, hora_key, hora)
         update_env_value(env_path, minuto_key, minuto)
         update_env_value(env_path, activo_key, activo)
+    
+    # Guardar tasa de cambio
+    tasa_cambio = request.form.get('tasa_cambio', '0')
+    update_env_value(env_path, 'TASA_CAMBIO_USD_BS', tasa_cambio)
     
     flash('Configuración guardada en .env. Reinicia la aplicación para aplicar los cambios.', 'success')
     return redirect(url_for('config.panel'))

@@ -28,6 +28,8 @@
                 <th>Stock</th>
                 <th>Stock Mínimo</th>
                 <th>Proveedor</th>
+                <th>Precio Mayor</th>
+                <th>Precio Detal</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -61,6 +63,22 @@
                 <td>{{ producto.stock_minimo }}</td>
                 <td>{{ producto.proveedor or '-' }}</td>
                 <td>
+                    {% if producto.precio_mayor_bs or producto.precio_mayor_usd %}
+                        <span class="text-success" title="Bs">{{ producto.precio_mayor_bs or '0' }} Bs</span><br>
+                        <span class="text-muted" title="USD">${{ producto.precio_mayor_usd or '0' }} USD</span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if producto.precio_detal_bs or producto.precio_detal_usd %}
+                        <span class="text-success" title="Bs">{{ producto.precio_detal_bs or '0' }} Bs</span><br>
+                        <span class="text-muted" title="USD">${{ producto.precio_detal_usd or '0' }} USD</span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>
                     <a href="{{ url_for('producto.editar', id=producto.id) }}" class="btn btn-sm btn-warning">
                         <i class="fas fa-edit"></i>
                     </a>
@@ -73,7 +91,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="9" class="text-center">No hay productos registrados.</td>
+                <td colspan="11" class="text-center">No hay productos registrados.</td>
             </tr>
             {% endfor %}
         </tbody>

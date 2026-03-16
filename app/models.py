@@ -14,6 +14,12 @@ class Producto(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     ultima_notificacion = db.Column(db.DateTime, nullable=True)
+    
+    # Campos de precio
+    precio_mayor_bs = db.Column(db.Numeric(10, 2), default=0.0)
+    precio_mayor_usd = db.Column(db.Numeric(10, 2), default=0.0)
+    precio_detal_bs = db.Column(db.Numeric(10, 2), default=0.0)
+    precio_detal_usd = db.Column(db.Numeric(10, 2), default=0.0)
 
     # Relación muchos a muchos con modelos de teléfono
     modelos_compatibles = db.relationship('ModeloTelefono', secondary='compatibilidad',

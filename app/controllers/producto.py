@@ -35,7 +35,11 @@ class ProductoController:
             categoria=data['categoria'],
             cantidad_stock=data['cantidad_stock'],
             stock_minimo=data['stock_minimo'],
-            proveedor=data.get('proveedor', '')
+            proveedor=data.get('proveedor', ''),
+            precio_mayor_bs=data.get('precio_mayor_bs', 0),
+            precio_mayor_usd=data.get('precio_mayor_usd', 0),
+            precio_detal_bs=data.get('precio_detal_bs', 0),
+            precio_detal_usd=data.get('precio_detal_usd', 0)
         )
         if modelos_ids:
             modelos = ModeloTelefono.query.filter(ModeloTelefono.id.in_(modelos_ids)).all()
@@ -59,6 +63,10 @@ class ProductoController:
         producto.cantidad_stock = data['cantidad_stock']
         producto.stock_minimo = data['stock_minimo']
         producto.proveedor = data.get('proveedor', '')
+        producto.precio_mayor_bs = data.get('precio_mayor_bs', 0)
+        producto.precio_mayor_usd = data.get('precio_mayor_usd', 0)
+        producto.precio_detal_bs = data.get('precio_detal_bs', 0)
+        producto.precio_detal_usd = data.get('precio_detal_usd', 0)
 
         if modelos_ids is not None:
             print(f"[DEPURACIÓN] modelos_ids recibidos: {modelos_ids}")
