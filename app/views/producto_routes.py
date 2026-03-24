@@ -149,3 +149,16 @@ def enviar_informe_manual():
         flash(f'Error al enviar el informe: {str(e)}', 'danger')
         current_app.logger.error(f"Error en envío manual de informe: {str(e)}")
     return redirect(url_for('producto.listar'))
+
+@producto_bp.route('/actualizar-stock/<int:id>', methods=['POST'])
+def actualizar_stock(id):
+    nuevo_stock = request.form.get('nuevo_stock', type=int)
+    if nuevo_stock is not None and nuevo_stock >= 0:
+        if ProductoController.actualizar_stock_rapido(id, nuevo_stock):
+            flash('Stock actualizado rápidamente', 'success')
+        else:
+            flash('Error al actualizar el stock', 'danger')
+    else:
+        flash('Cantidad de stock inválida', 'danger')
+        
+    return redirect(request.referrer or url_for('producto.listar'))

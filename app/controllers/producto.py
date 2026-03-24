@@ -139,3 +139,23 @@ class ProductoController:
         db.session.delete(producto)
         db.session.commit()
         return True
+
+    @staticmethod
+    def actualizar_stock_rapido(id: int, nueva_cantidad: int) -> bool:
+        producto = Producto.query.get(id)
+        if not producto:
+            return False
+        
+        try:
+            producto.cantidad_stock = nueva_cantidad
+            db.session.commit()
+            
+            # Check if stock is low to trigger alerts if necessary
+            if producto.cantidad_stock <= producto.stock_minimo:
+                verificar_stock_y_notificar(current_app._get_current_object())
+                
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error al actualizar stock de forma rápida: {e}")
+            return False

@@ -135,9 +135,14 @@
                 </td>
                 <td>{{ producto.categoria }}</td>
                 <td>
-                    <span class="badge {% if producto.cantidad_stock < producto.stock_minimo %}bg-danger{% else %}bg-success{% endif %}">
-                        {{ producto.cantidad_stock }}
-                    </span>
+                    <form action="{{ url_for('producto.actualizar_stock', id=producto.id) }}" method="POST" class="d-flex align-items-center" style="max-width: 120px;">
+                        <input type="number" name="nuevo_stock" value="{{ producto.cantidad_stock }}" min="0" 
+                               class="form-control form-control-sm me-1 {% if producto.cantidad_stock < producto.stock_minimo %}is-invalid border-danger text-danger{% endif %}" 
+                               style="width: 70px;">
+                        <button type="submit" class="btn btn-sm btn-success p-1" title="Guardar Stock">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
                 </td>
                 <td>{{ producto.stock_minimo }}</td>
                 <td>{{ producto.proveedor or '-' }}</td>
