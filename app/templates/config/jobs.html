@@ -9,8 +9,7 @@
         
         <div class="alert alert-info">
             <i class="fas fa-info-circle"></i>
-            <strong>Nota:</strong> Los cambios en esta configuración se guardan en el archivo <code>.env</code>.
-            Debes <strong>reiniciar la aplicación</strong> para que los cambios surtan efecto.
+            <strong>Nota:</strong> Los cambios en esta configuración se aplican de inmediato y se guardan de forma persistente.
         </div>
         
         <form action="{{ url_for('config.actualizar_jobs') }}" method="POST">
@@ -28,20 +27,20 @@
                         <div class="col-md-3">
                             <label class="form-label">Hora (0-23)</label>
                             <input type="number" class="form-control" 
-                                   name="JOB_{{ job.id.split('_')[0]|upper }}_{{ job.id.split('_')[1]|upper }}_HORA" 
+                                   name="{{ job.prefix }}_HORA" 
                                    value="{{ job.hora }}" min="0" max="23" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Minuto (0-59)</label>
                             <input type="number" class="form-control" 
-                                   name="JOB_{{ job.id.split('_')[0]|upper }}_{{ job.id.split('_')[1]|upper }}_MINUTO" 
+                                   name="{{ job.prefix }}_MINUTO" 
                                    value="{{ job.minuto }}" min="0" max="59" required>
                         </div>
                         <div class="col-md-6 d-flex align-items-center">
                             <div class="form-check form-switch mt-4">
                                 <input class="form-check-input" type="checkbox" role="switch" 
                                        id="job_{{ job.id }}" 
-                                       name="JOB_{{ job.id.split('_')[0]|upper }}_{{ job.id.split('_')[1]|upper }}_ACTIVO"
+                                       name="{{ job.prefix }}_ACTIVO"
                                        {% if job.activo %}checked{% endif %}>
                                 <label class="form-check-label" for="job_{{ job.id }}">
                                     Job activo
