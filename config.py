@@ -1,7 +1,10 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Carga variables de entorno desde .env
+basedir = os.path.abspath(os.path.dirname(__file__))
+env_path = os.path.join(basedir, '.env')
+
+load_dotenv(dotenv_path=env_path, override=True)  # Carga variables de entorno desde .env y sobrescribe
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-secreta-para-desarrollo'
