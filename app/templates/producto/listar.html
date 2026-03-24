@@ -151,8 +151,15 @@
                 </td>
                 <td>
                     {% if producto.precio_detal_bs or producto.precio_detal_usd %}
-                        <span class="text-success" title="Bs">{{ producto.precio_detal_bs or '0' }} Bs</span><br>
-                        <span class="text-muted" title="USD">${{ producto.precio_detal_usd or '0' }} USD</span>
+                        <div class="text-success fw-bold">{{ "%.2f"|format(producto.precio_detal_bs) }} Bs</div>
+                        <div class="text-muted small">{{ "%.2f"|format(producto.precio_detal_usd) }} USD</div>
+                        {% if producto.categoria == 'pantalla' and producto.precio_tecnico_usd and producto.precio_tecnico_usd > 0 %}
+                        <div class="mt-1">
+                            <span class="badge bg-warning text-dark" title="Costo Técnico">
+                                <i class="fas fa-tools"></i> {{ "%.2f"|format(producto.precio_tecnico_usd) }}$
+                            </span>
+                        </div>
+                        {% endif %}
                     {% else %}
                         <span class="text-muted">-</span>
                     {% endif %}

@@ -120,10 +120,12 @@ def actualizar_jobs():
         from app import db
         productos = Producto.query.all()
         for p in productos:
-            if p.precio_mayor_usd:
+            if p.precio_mayor_usd is not None:
                 p.precio_mayor_bs = float(p.precio_mayor_usd) * nueva_tasa
-            if p.precio_detal_usd:
+            if p.precio_detal_usd is not None:
                 p.precio_detal_bs = float(p.precio_detal_usd) * nueva_tasa
+            if p.precio_tecnico_usd is not None:
+                p.precio_tecnico_bs = float(p.precio_tecnico_usd) * nueva_tasa
         db.session.commit()
         mensaje_extra = f" Se actualizaron los precios en Bs de {len(productos)} productos."
 

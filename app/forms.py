@@ -29,6 +29,9 @@ class ProductoForm(FlaskForm):
     precio_mayor_usd = DecimalField('Precio por mayor (USD)', validators=[Optional()])
     precio_detal_bs = DecimalField('Precio al detal (Bs)', validators=[Optional()])
     precio_detal_usd = DecimalField('Precio al detal (USD)', validators=[Optional()])
+    
+    precio_tecnico_bs = DecimalField('Precio técnico (Bs)', validators=[Optional()])
+    precio_tecnico_usd = DecimalField('Precio técnico (USD)', validators=[Optional()])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

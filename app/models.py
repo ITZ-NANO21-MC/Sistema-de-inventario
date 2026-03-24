@@ -20,6 +20,8 @@ class Producto(db.Model):
     precio_mayor_usd = db.Column(db.Numeric(10, 2), default=0.0)
     precio_detal_bs = db.Column(db.Numeric(10, 2), default=0.0)
     precio_detal_usd = db.Column(db.Numeric(10, 2), default=0.0)
+    precio_tecnico_bs = db.Column(db.Numeric(10, 2), default=0.0)
+    precio_tecnico_usd = db.Column(db.Numeric(10, 2), default=0.0)
 
     # Relación muchos a muchos con modelos de teléfono
     modelos_compatibles = db.relationship('ModeloTelefono', secondary='compatibilidad',
