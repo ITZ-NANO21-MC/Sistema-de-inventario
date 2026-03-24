@@ -153,12 +153,23 @@
                     {% if producto.precio_detal_bs or producto.precio_detal_usd %}
                         <div class="text-success fw-bold">{{ "%.2f"|format(producto.precio_detal_bs) }} Bs</div>
                         <div class="text-muted small">{{ "%.2f"|format(producto.precio_detal_usd) }} USD</div>
-                        {% if producto.categoria == 'pantalla' and producto.precio_tecnico_usd and producto.precio_tecnico_usd > 0 %}
-                        <div class="mt-1">
-                            <span class="badge bg-warning text-dark" title="Costo Técnico">
-                                <i class="fas fa-tools"></i> {{ "%.2f"|format(producto.precio_tecnico_usd) }}$
-                            </span>
-                        </div>
+                        {% if producto.categoria == 'pantalla' %}
+                            <div class="mt-1">
+                                <span class="badge bg-warning text-dark" title="Costo Técnico">
+                                    <i class="fas fa-tools"></i> Costo: 
+                                    {% if producto.precio_tecnico_usd %}
+                                        {{ "%.2f"|format(producto.precio_tecnico_usd) }}$
+                                    {% else %}
+                                        0.00$
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% else %}
+                            <div class="mt-1">
+                                <span class="badge bg-secondary text-white" title="Costo Técnico no aplica">
+                                    <i class="fas fa-tools"></i> Costo: N/A
+                                </span>
+                            </div>
                         {% endif %}
                     {% else %}
                         <span class="text-muted">-</span>

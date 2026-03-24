@@ -63,7 +63,9 @@ def crear():
             'precio_mayor_bs': form.precio_mayor_bs.data or 0,
             'precio_mayor_usd': form.precio_mayor_usd.data or 0,
             'precio_detal_bs': form.precio_detal_bs.data or 0,
-            'precio_detal_usd': form.precio_detal_usd.data or 0
+            'precio_detal_usd': form.precio_detal_usd.data or 0,
+            'precio_tecnico_bs': form.precio_tecnico_bs.data or 0,
+            'precio_tecnico_usd': form.precio_tecnico_usd.data or 0
         }
         modelos_ids = form.modelos_compatibles.data if form.categoria.data == 'pantalla' else []
         ProductoController.crear(data, modelos_ids)
@@ -102,7 +104,9 @@ def editar(id):
             'precio_mayor_bs': form.precio_mayor_bs.data or 0,
             'precio_mayor_usd': form.precio_mayor_usd.data or 0,
             'precio_detal_bs': form.precio_detal_bs.data or 0,
-            'precio_detal_usd': form.precio_detal_usd.data or 0
+            'precio_detal_usd': form.precio_detal_usd.data or 0,
+            'precio_tecnico_bs': form.precio_tecnico_bs.data or 0,
+            'precio_tecnico_usd': form.precio_tecnico_usd.data or 0
         }
         modelos_ids = form.modelos_compatibles.data if form.categoria.data == 'pantalla' else []
         ProductoController.actualizar(id, data, modelos_ids)

@@ -16,23 +16,25 @@
                         {{ form.nombre.label(class="form-label") }}
                         {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else "")) }}
                         {% for error in form.nombre.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
+                        <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
                     </div>
 
                     <div class="mb-3">
                         {{ form.descripcion.label(class="form-label") }}
-                        {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""), rows=3) }}
+                        {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""),
+                        rows=3) }}
                         {% for error in form.descripcion.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
+                        <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
                     </div>
 
                     <div class="mb-3">
                         {{ form.categoria.label(class="form-label") }}
-                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else ""), id="categoria") }}
+                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else ""),
+                        id="categoria") }}
                         {% for error in form.categoria.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
+                        <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
                     </div>
 
@@ -48,16 +50,18 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             {{ form.cantidad_stock.label(class="form-label") }}
-                            {{ form.cantidad_stock(class="form-control" + (" is-invalid" if form.cantidad_stock.errors else ""), type="number", min="0") }}
+                            {{ form.cantidad_stock(class="form-control" + (" is-invalid" if form.cantidad_stock.errors
+                            else ""), type="number", min="0") }}
                             {% for error in form.cantidad_stock.errors %}
-                                <div class="invalid-feedback">{{ error }}</div>
+                            <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ form.stock_minimo.label(class="form-label") }}
-                            {{ form.stock_minimo(class="form-control" + (" is-invalid" if form.stock_minimo.errors else ""), type="number", min="1") }}
+                            {{ form.stock_minimo(class="form-control" + (" is-invalid" if form.stock_minimo.errors else
+                            ""), type="number", min="1") }}
                             {% for error in form.stock_minimo.errors %}
-                                <div class="invalid-feedback">{{ error }}</div>
+                            <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>
                     </div>
@@ -66,7 +70,7 @@
                         {{ form.proveedor.label(class="form-label") }}
                         {{ form.proveedor(class="form-control" + (" is-invalid" if form.proveedor.errors else "")) }}
                         {% for error in form.proveedor.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
+                        <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
                     </div>
 
@@ -79,18 +83,22 @@
                             <div class="alert alert-info mb-3">
                                 <i class="fas fa-info-circle"></i>
                                 <strong>Tasa de cambio configurada:</strong> 1 USD = {{ tasa_cambio }} Bs
-                                <br><small>Al ingresar un precio en una moneda, se calculará automáticamente el equivalente en la otra.</small>
+                                <br><small>Al ingresar un precio en una moneda, se calculará automáticamente el
+                                    equivalente en la otra.</small>
                             </div>
                             {% endif %}
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     {{ form.precio_mayor_usd.label(class="form-label") }}
-                                    {{ form.precio_mayor_usd(class="form-control", type="number", step="0.01", min="0", placeholder="0.00", id="precio_mayor_usd") }}
+                                    {{ form.precio_mayor_usd(class="form-control", type="number", step="0.01", min="0",
+                                    placeholder="0.00", id="precio_mayor_usd") }}
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     {{ form.precio_mayor_bs.label(class="form-label") }}
-                                    {{ form.precio_mayor_bs(class="form-control bg-light", type="number", step="0.01", min="0", placeholder="0.00", id="precio_mayor_bs", readonly=True) }}
-                                    <small class="text-success indicador-auto" id="indicador-mayor-bs" style="display:none;">
+                                    {{ form.precio_mayor_bs(class="form-control bg-light", type="number", step="0.01",
+                                    min="0", placeholder="0.00", id="precio_mayor_bs", readonly=True) }}
+                                    <small class="text-success indicador-auto" id="indicador-mayor-bs"
+                                        style="display:none;">
                                         <i class="fas fa-calculator"></i> Calculado automáticamente
                                     </small>
                                 </div>
@@ -98,29 +106,38 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     {{ form.precio_detal_usd.label(class="form-label") }}
-                                    {{ form.precio_detal_usd(class="form-control", type="number", step="0.01", min="0", placeholder="0.00", id="precio_detal_usd") }}
+                                    {{ form.precio_detal_usd(class="form-control", type="number", step="0.01", min="0",
+                                    placeholder="0.00", id="precio_detal_usd") }}
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     {{ form.precio_detal_bs.label(class="form-label") }}
-                                    {{ form.precio_detal_bs(class="form-control bg-light", type="number", step="0.01", min="0", placeholder="0.00", id="precio_detal_bs", readonly=True) }}
-                                    <small class="text-success indicador-auto" id="indicador-detal-bs" style="display:none;">
+                                    {{ form.precio_detal_bs(class="form-control bg-light", type="number", step="0.01",
+                                    min="0", placeholder="0.00", id="precio_detal_bs", readonly=True) }}
+                                    <small class="text-success indicador-auto" id="indicador-detal-bs"
+                                        style="display:none;">
                                         <i class="fas fa-calculator"></i> Calculado automáticamente
                                     </small>
                                 </div>
                             </div>
-                            
+
                             <!-- Campo de Precio Técnico (visible solo para pantallas) -->
-                            <div class="row pt-3 mt-3 border-top" id="precio-tecnico-field" style="display: {% if producto.categoria == 'pantalla' %}flex{% else %}none{% endif %};">
+                            <div class="row pt-3 mt-3 border-top" id="precio-tecnico-field"
+                                style="display: {% if producto.categoria == 'pantalla' %}flex{% else %}none{% endif %};">
                                 <h6><i class="fas fa-tools"></i> Precio Técnico (Costo)</h6>
-                                <p class="text-muted small mb-3">Solo aplicable para pantallas. Define el nivel de precio para cubrir costos.</p>
+                                <p class="text-muted small mb-3">Solo aplicable para pantallas. Define el nivel de
+                                    precio para cubrir costos.</p>
                                 <div class="col-md-6 mb-3">
                                     {{ form.precio_tecnico_usd.label(class="form-label") }}
-                                    {{ form.precio_tecnico_usd(class="form-control border-warning", type="number", step="0.01", min="0", placeholder="0.00", id="precio_tecnico_usd") }}
+                                    {{ form.precio_tecnico_usd(class="form-control border-warning", type="number",
+                                    step="0.01", min="0", placeholder="0.00", id="precio_tecnico_usd") }}
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     {{ form.precio_tecnico_bs.label(class="form-label") }}
-                                    {{ form.precio_tecnico_bs(class="form-control bg-light border-warning", type="number", step="0.01", min="0", placeholder="0.00", id="precio_tecnico_bs", readonly=True) }}
-                                    <small class="text-success indicador-auto" id="indicador-tecnico-bs" style="display:none;">
+                                    {{ form.precio_tecnico_bs(class="form-control bg-light border-warning",
+                                    type="number", step="0.01", min="0", placeholder="0.00", id="precio_tecnico_bs",
+                                    readonly=True) }}
+                                    <small class="text-success indicador-auto" id="indicador-tecnico-bs"
+                                        style="display:none;">
                                         <i class="fas fa-calculator"></i> Calculado automáticamente
                                     </small>
                                 </div>
@@ -138,81 +155,82 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const categoriaSelect = document.getElementById('categoria');
-    const modelosField = document.getElementById('modelos-field');
-    const tecnicoField = document.getElementById('precio-tecnico-field');
-    const checkboxes = modelosField.querySelectorAll('input[type=checkbox]');
 
-    function togglePantallaFields() {
-        if (categoriaSelect.value === 'pantalla') {
-            modelosField.style.display = 'block';
-            if (tecnicoField) tecnicoField.style.display = 'flex';
-            checkboxes.forEach(cb => cb.disabled = false);
-        } else {
-            modelosField.style.display = 'none';
-            if (tecnicoField) tecnicoField.style.display = 'none';
-            checkboxes.forEach(cb => cb.disabled = true);
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoriaSelect = document.getElementById('categoria');
+        const modelosField = document.getElementById('modelos-field');
+        const tecnicoField = document.getElementById('precio-tecnico-field');
+        const checkboxes = modelosField.querySelectorAll('input[type=checkbox]');
+
+        function togglePantallaFields() {
+            if (categoriaSelect.value === 'pantalla') {
+                modelosField.style.display = 'block';
+                if (tecnicoField) tecnicoField.style.display = 'flex';
+                checkboxes.forEach(cb => cb.disabled = false);
+            } else {
+                modelosField.style.display = 'none';
+                if (tecnicoField) tecnicoField.style.display = 'none';
+                checkboxes.forEach(cb => cb.disabled = true);
+            }
         }
-    }
-    
-    // Ejecutar al cargar para asegurar estado correcto
-    togglePantallaFields();
-    
-    categoriaSelect.addEventListener('change', togglePantallaFields);
-    
-    if (tasaCambio > 0) {
-        const precioMayorBs = document.getElementById('precio_mayor_bs');
-        const precioMayorUsd = document.getElementById('precio_mayor_usd');
-        const precioDetalBs = document.getElementById('precio_detal_bs');
-        const precioDetalUsd = document.getElementById('precio_detal_usd');
-        
-        const indicadorMayorBs = document.getElementById('indicador-mayor-bs');
-        const indicadorDetalBs = document.getElementById('indicador-detal-bs');
-        
-        // Precio Mayor: USD -> Bs
-        precioMayorUsd.addEventListener('input', function() {
-            if (this.value && tasaCambio > 0) {
-                const resultado = (parseFloat(this.value) * tasaCambio).toFixed(2);
-                precioMayorBs.value = resultado;
-                indicadorMayorBs.style.display = 'block';
-            } else {
-                precioMayorBs.value = '';
-                indicadorMayorBs.style.display = 'none';
-            }
-        });
-        
-        // Precio Detal: USD -> Bs
-        precioDetalUsd.addEventListener('input', function() {
-            if (this.value && tasaCambio > 0) {
-                const resultado = (parseFloat(this.value) * tasaCambio).toFixed(2);
-                precioDetalBs.value = resultado;
-                indicadorDetalBs.style.display = 'block';
-            } else {
-                precioDetalBs.value = '';
-                indicadorDetalBs.style.display = 'none';
-            }
-        });
-        
-        // Precio Tecnico: USD -> Bs
-        const precioTecnicoUsd = document.getElementById('precio_tecnico_usd');
-        const precioTecnicoBs = document.getElementById('precio_tecnico_bs');
-        const indicadorTecnicoBs = document.getElementById('indicador-tecnico-bs');
-        
-        if (precioTecnicoUsd) {
-            precioTecnicoUsd.addEventListener('input', function() {
+        togglePantallaFields();
+        categoriaSelect.addEventListener('change', togglePantallaFields);
+
+        // Cálculo automático de precios
+        const tasaCambio = parseFloat(document.getElementById('tasa_cambio').value) || 0;
+
+        if (tasaCambio > 0) {
+            const precioMayorBs = document.getElementById('precio_mayor_bs');
+            const precioMayorUsd = document.getElementById('precio_mayor_usd');
+            const precioDetalBs = document.getElementById('precio_detal_bs');
+            const precioDetalUsd = document.getElementById('precio_detal_usd');
+
+            const indicadorMayorBs = document.getElementById('indicador-mayor-bs');
+            const indicadorDetalBs = document.getElementById('indicador-detal-bs');
+
+            // Precio Mayor: USD -> Bs
+            precioMayorUsd.addEventListener('input', function () {
                 if (this.value && tasaCambio > 0) {
                     const resultado = (parseFloat(this.value) * tasaCambio).toFixed(2);
-                    precioTecnicoBs.value = resultado;
-                    indicadorTecnicoBs.style.display = 'block';
+                    precioMayorBs.value = resultado;
+                    indicadorMayorBs.style.display = 'block';
                 } else {
-                    precioTecnicoBs.value = '';
-                    indicadorTecnicoBs.style.display = 'none';
+                    precioMayorBs.value = '';
+                    indicadorMayorBs.style.display = 'none';
                 }
             });
+
+            // Precio Detal: USD -> Bs
+            precioDetalUsd.addEventListener('input', function () {
+                if (this.value && tasaCambio > 0) {
+                    const resultado = (parseFloat(this.value) * tasaCambio).toFixed(2);
+                    precioDetalBs.value = resultado;
+                    indicadorDetalBs.style.display = 'block';
+                } else {
+                    precioDetalBs.value = '';
+                    indicadorDetalBs.style.display = 'none';
+                }
+            });
+
+            // Precio Tecnico: USD -> Bs
+            const precioTecnicoUsd = document.getElementById('precio_tecnico_usd');
+            const precioTecnicoBs = document.getElementById('precio_tecnico_bs');
+            const indicadorTecnicoBs = document.getElementById('indicador-tecnico-bs');
+
+            if (precioTecnicoUsd) {
+                precioTecnicoUsd.addEventListener('input', function () {
+                    if (this.value && tasaCambio > 0) {
+                        const resultado = (parseFloat(this.value) * tasaCambio).toFixed(2);
+                        precioTecnicoBs.value = resultado;
+                        indicadorTecnicoBs.style.display = 'block';
+                    } else {
+                        precioTecnicoBs.value = '';
+                        indicadorTecnicoBs.style.display = 'none';
+                    }
+                });
+            }
         }
-    }
-});
+    });
 </script>
 {% endblock %}
