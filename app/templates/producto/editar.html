@@ -39,7 +39,7 @@
                     </div>
 
                     <!-- Campo de modelos compatibles -->
-                    <div class="mb-3" id="modelos-field">
+                    <div class="mb-3" id="modelos-field" style="display: {% if producto.categoria == 'pantalla' %}block{% else %}none{% endif %};">
                         {{ form.modelos_compatibles.label(class="form-label") }}
                         <div class="border p-3 rounded">
                             {{ form.modelos_compatibles() }}
