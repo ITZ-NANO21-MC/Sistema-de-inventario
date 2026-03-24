@@ -21,7 +21,13 @@ class AlertaController:
         config = ConfiguracionSistema.query.filter_by(
             clave='ultima_alerta_global'
         ).first()
-        return config.valor if config else None
+        if config and config.valor:
+            try:
+                # Python 3.12 fromisoformat maneja 'YYYY-MM-DD HH:MM:SS.mmmmmm'
+                return datetime.fromisoformat(str(config.valor))
+            except ValueError:
+                pass
+        return None
     
     @staticmethod
     def guardar_fecha_global():
