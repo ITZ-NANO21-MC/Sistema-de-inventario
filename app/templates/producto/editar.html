@@ -84,32 +84,26 @@
                             {% endif %}
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    {{ form.precio_mayor_bs.label(class="form-label") }}
-                                    {{ form.precio_mayor_bs(class="form-control", type="number", step="0.01", min="0", placeholder="0.00", id="precio_mayor_bs") }}
-                                    <small class="text-success indicador-auto" id="indicador-mayor-bs" style="display:none;">
-                                        <i class="fas fa-calculator"></i> Calculado automáticamente
-                                    </small>
-                                </div>
-                                <div class="col-md-6 mb-3">
                                     {{ form.precio_mayor_usd.label(class="form-label") }}
                                     {{ form.precio_mayor_usd(class="form-control", type="number", step="0.01", min="0", placeholder="0.00", id="precio_mayor_usd") }}
-                                    <small class="text-success indicador-auto" id="indicador-mayor-usd" style="display:none;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.precio_mayor_bs.label(class="form-label") }}
+                                    {{ form.precio_mayor_bs(class="form-control bg-light", type="number", step="0.01", min="0", placeholder="0.00", id="precio_mayor_bs", readonly=True) }}
+                                    <small class="text-success indicador-auto" id="indicador-mayor-bs" style="display:none;">
                                         <i class="fas fa-calculator"></i> Calculado automáticamente
                                     </small>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    {{ form.precio_detal_bs.label(class="form-label") }}
-                                    {{ form.precio_detal_bs(class="form-control", type="number", step="0.01", min="0", placeholder="0.00", id="precio_detal_bs") }}
-                                    <small class="text-success indicador-auto" id="indicador-detal-bs" style="display:none;">
-                                        <i class="fas fa-calculator"></i> Calculado automáticamente
-                                    </small>
-                                </div>
-                                <div class="col-md-6 mb-3">
                                     {{ form.precio_detal_usd.label(class="form-label") }}
                                     {{ form.precio_detal_usd(class="form-control", type="number", step="0.01", min="0", placeholder="0.00", id="precio_detal_usd") }}
-                                    <small class="text-success indicador-auto" id="indicador-detal-usd" style="display:none;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.precio_detal_bs.label(class="form-label") }}
+                                    {{ form.precio_detal_bs(class="form-control bg-light", type="number", step="0.01", min="0", placeholder="0.00", id="precio_detal_bs", readonly=True) }}
+                                    <small class="text-success indicador-auto" id="indicador-detal-bs" style="display:none;">
                                         <i class="fas fa-calculator"></i> Calculado automáticamente
                                     </small>
                                 </div>
@@ -138,37 +132,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const precioDetalUsd = document.getElementById('precio_detal_usd');
         
         const indicadorMayorBs = document.getElementById('indicador-mayor-bs');
-        const indicadorMayorUsd = document.getElementById('indicador-mayor-usd');
         const indicadorDetalBs = document.getElementById('indicador-detal-bs');
-        const indicadorDetalUsd = document.getElementById('indicador-detal-usd');
-        
-        // Precio Mayor: Bs -> USD
-        precioMayorBs.addEventListener('input', function() {
-            if (this.value && tasaCambio > 0) {
-                const resultado = (parseFloat(this.value) / tasaCambio).toFixed(2);
-                precioMayorUsd.value = resultado;
-                indicadorMayorBs.style.display = 'block';
-                indicadorMayorUsd.style.display = 'none';
-            }
-        });
         
         // Precio Mayor: USD -> Bs
         precioMayorUsd.addEventListener('input', function() {
             if (this.value && tasaCambio > 0) {
                 const resultado = (parseFloat(this.value) * tasaCambio).toFixed(2);
                 precioMayorBs.value = resultado;
-                indicadorMayorUsd.style.display = 'block';
+                indicadorMayorBs.style.display = 'block';
+            } else {
+                precioMayorBs.value = '';
                 indicadorMayorBs.style.display = 'none';
-            }
-        });
-        
-        // Precio Detal: Bs -> USD
-        precioDetalBs.addEventListener('input', function() {
-            if (this.value && tasaCambio > 0) {
-                const resultado = (parseFloat(this.value) / tasaCambio).toFixed(2);
-                precioDetalUsd.value = resultado;
-                indicadorDetalBs.style.display = 'block';
-                indicadorDetalUsd.style.display = 'none';
             }
         });
         
@@ -177,7 +151,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.value && tasaCambio > 0) {
                 const resultado = (parseFloat(this.value) * tasaCambio).toFixed(2);
                 precioDetalBs.value = resultado;
-                indicadorDetalUsd.style.display = 'block';
+                indicadorDetalBs.style.display = 'block';
+            } else {
+                precioDetalBs.value = '';
                 indicadorDetalBs.style.display = 'none';
             }
         });

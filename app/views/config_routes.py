@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 import os
 from dotenv import load_dotenv
+from config import Config
 
 config_bp = Blueprint('config', __name__, template_folder='../templates/config')
 
@@ -101,10 +102,32 @@ def actualizar_jobs():
     
     # Guardar tasa de cambio
     tasa_cambio = request.form.get('tasa_cambio', '0')
+    try:
+        nueva_tasa = float(tasa_cambio)
+        tasa_actual = float(os.environ.get('TASA_CAMBIO_USD_BS', '0'))
+    except ValueError:
+        nueva_tasa = 0
+        tasa_actual = 0
+        
     update_env_value(env_path, 'TASA_CAMBIO_USD_BS', tasa_cambio)
     os.environ['TASA_CAMBIO_USD_BS'] = str(tasa_cambio)
-    
-    flash('Configuración guardada y jobs actualizados con éxito.', 'success')
+    Config.TASA_CAMBIO_USD_BS = nueva_tasa
+
+    mensaje_extra = ""
+    # Si la tasa cambió de forma válida, actualizar inventario
+    if nueva_tasa > 0 and nueva_tasa != tasa_actual:
+        from app.models import Producto
+        from app import db
+        productos = Producto.query.all()
+        for p in productos:
+            if p.precio_mayor_usd:
+                p.precio_mayor_bs = float(p.precio_mayor_usd) * nueva_tasa
+            if p.precio_detal_usd:
+                p.precio_detal_bs = float(p.precio_detal_usd) * nueva_tasa
+        db.session.commit()
+        mensaje_extra = f" Se actualizaron los precios en Bs de {len(productos)} productos."
+
+    flash(f'Configuración guardada y jobs actualizados con éxito.{mensaje_extra}', 'success')
     return redirect(url_for('config.panel'))
 
 
