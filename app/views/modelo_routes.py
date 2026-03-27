@@ -7,8 +7,25 @@ modelo_bp = Blueprint('modelo', __name__, template_folder='../templates/modelo')
 
 @modelo_bp.route('/')
 def listar():
-    modelos = ModeloTelefono.query.order_by(ModeloTelefono.nombre).all()
-    return render_template('modelo/listar.html', modelos=modelos)
+    busqueda = request.args.get('busqueda', '').strip()
+    marca = request.args.get('marca', '').strip()
+    
+    query = ModeloTelefono.query
+    
+    if busqueda:
+        query = query.filter(ModeloTelefono.nombre.ilike(f'%{busqueda}%'))
+    if marca:
+        query = query.filter(ModeloTelefono.marca == marca)
+    
+    modelos = query.order_by(ModeloTelefono.nombre).all()
+    
+    # Obtener marcas únicas para el filtro dinámico
+    marcas = db.session.query(ModeloTelefono.marca).filter(
+        ModeloTelefono.marca.isnot(None), ModeloTelefono.marca != ''
+    ).distinct().order_by(ModeloTelefono.marca).all()
+    marcas = [m[0] for m in marcas]
+    
+    return render_template('modelo/listar.html', modelos=modelos, marcas=marcas)
 
 
 @modelo_bp.route('/crear', methods=['GET', 'POST'])

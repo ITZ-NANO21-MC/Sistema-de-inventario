@@ -24,7 +24,7 @@ class ProductoController:
         return Producto.query.options(joinedload(Producto.modelos_compatibles)).order_by(Producto.nombre).all()
 
     @staticmethod
-    def obtener_con_filtros(busqueda=None, categoria=None, precio_min=None, precio_max=None, 
+    def obtener_con_filtros(busqueda=None, categoria=None, marca=None, precio_min=None, precio_max=None, 
                             precio_min_usd=None, precio_max_usd=None,
                             proveedor=None, stock_bajo=None, stock_minimo=None, stock_maximo=None) -> List[Producto]:
         query = Producto.query.options(joinedload(Producto.modelos_compatibles))
@@ -36,6 +36,10 @@ class ProductoController:
         # Filtro por categoría
         if categoria:
             query = query.filter(Producto.categoria == categoria)
+        
+        # Filtro por marca
+        if marca:
+            query = query.filter(Producto.marca == marca)
         
         # Filtro por precio mayor (Bs)
         if precio_min is not None:

@@ -30,11 +30,22 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Categoría</label>
-                <select class="form-select" name="categoria">
+                <select class="form-select" name="categoria" id="filtro-categoria">
                     <option value="">Todas</option>
                     {% for cat in categorias %}
                     <option value="{{ cat }}" {% if request.args.get('categoria') == cat %}selected{% endif %}>
                         {{ cat }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2" id="filtro-marca-field" style="display: {% if request.args.get('categoria') == 'pantalla' %}block{% else %}none{% endif %};">
+                <label class="form-label">Marca</label>
+                <select class="form-select" name="marca">
+                    <option value="">Todas</option>
+                    {% for m in marcas %}
+                    <option value="{{ m }}" {% if request.args.get('marca') == m %}selected{% endif %}>
+                        {{ m }}
                     </option>
                     {% endfor %}
                 </select>
@@ -94,6 +105,23 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filtroCat = document.getElementById('filtro-categoria');
+    const filtroMarca = document.getElementById('filtro-marca-field');
+    
+    filtroCat.addEventListener('change', function() {
+        if (this.value === 'pantalla') {
+            filtroMarca.style.display = 'block';
+        } else {
+            filtroMarca.style.display = 'none';
+            // Limpiar selección de marca si se cambia de categoría
+            filtroMarca.querySelector('select').value = '';
+        }
+    });
+});
+</script>
 
 <div class="table-responsive">
     <table class="table table-striped table-hover">

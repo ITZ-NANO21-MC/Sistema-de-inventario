@@ -17,6 +17,7 @@ def listar():
     # Obtener parámetros de búsqueda
     busqueda = request.args.get('busqueda', '').strip()
     categoria = request.args.get('categoria', '').strip()
+    marca = request.args.get('marca', '').strip()
     precio_min = request.args.get('precio_min', type=float)
     precio_max = request.args.get('precio_max', type=float)
     precio_min_usd = request.args.get('precio_min_usd', type=float)
@@ -27,10 +28,11 @@ def listar():
     stock_maximo = request.args.get('stock_maximo', type=int)
     
     # Verificar si hay filtros activos
-    if busqueda or categoria or precio_min or precio_max or precio_min_usd or precio_max_usd or proveedor or stock_bajo or stock_minimo or stock_maximo:
+    if busqueda or categoria or marca or precio_min or precio_max or precio_min_usd or precio_max_usd or proveedor or stock_bajo or stock_minimo or stock_maximo:
         productos = ProductoController.obtener_con_filtros(
             busqueda=busqueda if busqueda else None,
             categoria=categoria if categoria else None,
+            marca=marca if marca else None,
             precio_min=precio_min,
             precio_max=precio_max,
             precio_min_usd=precio_min_usd,
@@ -47,7 +49,13 @@ def listar():
     categorias = db.session.query(Producto.categoria).distinct().all()
     categorias = [c[0] for c in categorias]
     
-    return render_template('listar.html', productos=productos, categorias=categorias)
+    # Obtener marcas únicas para el filtro dinámico
+    marcas = db.session.query(Producto.marca).filter(
+        Producto.marca.isnot(None), Producto.marca != ''
+    ).distinct().order_by(Producto.marca).all()
+    marcas = [m[0] for m in marcas]
+    
+    return render_template('listar.html', productos=productos, categorias=categorias, marcas=marcas)
 
 @producto_bp.route('/crear', methods=['GET', 'POST'])
 def crear():

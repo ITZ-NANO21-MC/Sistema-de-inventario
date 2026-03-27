@@ -8,6 +8,41 @@
     </a>
 </div>
 
+<div class="card mb-4">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar y Filtrar</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('modelo.listar') }}" class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">Buscar por nombre</label>
+                <input type="text" class="form-control" name="busqueda" 
+                       value="{{ request.args.get('busqueda', '') }}" 
+                       placeholder="Nombre del modelo...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Marca</label>
+                <select class="form-select" name="marca">
+                    <option value="">Todas</option>
+                    {% for m in marcas %}
+                    <option value="{{ m }}" {% if request.args.get('marca') == m %}selected{% endif %}>
+                        {{ m }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <a href="{{ url_for('modelo.listar') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
