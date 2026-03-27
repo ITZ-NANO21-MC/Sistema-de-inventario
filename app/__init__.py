@@ -22,8 +22,10 @@ def create_app(config_class=Config):
     # Configuración de APScheduler
     scheduler.init_app(app)
     
-    # Solo registrar y arrancar los jobs en el proceso hijo del reloader (evita duplicados)
-    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug:
+    # Solo registrar y arrancar jobs en el proceso hijo del reloader.
+    # NOTA: app.debug es False aquí porque debug=True se aplica después en app.run().
+    # Por eso solo verificamos WERKZEUG_RUN_MAIN (solo existe en el proceso hijo).
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
         
         # Alerta de stock bajo - configurable desde .env
