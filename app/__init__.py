@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_apscheduler import APScheduler
 from config import Config
+import os
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -60,7 +61,9 @@ def create_app(config_class=Config):
     # Ejemplo alternativo de prueba: se ejecutaría cada minuto
     #scheduler.add_job(id='test_alerta', func=verificar_stock_y_notificar, args=[app], trigger='interval', minutes=1)
     
-    scheduler.start()
+    # Solo iniciar scheduler en el proceso hijo del reloader (o sin reloader)
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug:
+        scheduler.start()
 
     # Registro de blueprints
     from app.views.producto_routes import producto_bp

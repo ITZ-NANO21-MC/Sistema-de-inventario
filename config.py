@@ -21,6 +21,7 @@ class Config:
     
     # Configuración de Flask-APScheduler
     SCHEDULER_API_ENABLED = True
+    SCHEDULER_TIMEZONE = 'America/Caracas'  # UTC-4, hora de Venezuela
     
     # Configuración de Jobs - Alerta Stock Bajo
     JOB_ALERTA_STOCK_HORA = int(os.environ.get('JOB_ALERTA_STOCK_HORA', 8))
