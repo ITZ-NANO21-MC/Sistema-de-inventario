@@ -22,47 +22,43 @@ def create_app(config_class=Config):
     # Configuración de APScheduler
     scheduler.init_app(app)
     
-    # Programar jobs usando configuración dinámica
-    from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
-    
-    # Alerta de stock bajo - configurable desde .env
-    if app.config.get('JOB_ALERTA_STOCK_ACTIVO', True):
-        scheduler.add_job(
-            id='alerta_stock_diaria',
-            func=verificar_stock_y_notificar,
-            args=[app],
-            trigger='cron',
-            hour=app.config.get('JOB_ALERTA_STOCK_HORA', 8),
-            minute=app.config.get('JOB_ALERTA_STOCK_MINUTO', 0)
-        )
-    
-    # Informe general de la mañana - configurable desde .env
-    if app.config.get('JOB_INFORME_MANANA_ACTIVO', True):
-        scheduler.add_job(
-            id='informe_general_manana',
-            func=generar_informe_general,
-            args=[app],
-            trigger='cron',
-            hour=app.config.get('JOB_INFORME_MANANA_HORA', 7),
-            minute=app.config.get('JOB_INFORME_MANANA_MINUTO', 0)
-        )
-    
-    # Informe general de la tarde - configurable desde .env
-    if app.config.get('JOB_INFORME_TARDE_ACTIVO', True):
-        scheduler.add_job(
-            id='informe_general_tarde',
-            func=generar_informe_general,
-            args=[app],
-            trigger='cron',
-            hour=app.config.get('JOB_INFORME_TARDE_HORA', 19),
-            minute=app.config.get('JOB_INFORME_TARDE_MINUTO', 0)
-        )
-    
-    # Ejemplo alternativo de prueba: se ejecutaría cada minuto
-    #scheduler.add_job(id='test_alerta', func=verificar_stock_y_notificar, args=[app], trigger='interval', minutes=1)
-    
-    # Solo iniciar scheduler en el proceso hijo del reloader (o sin reloader)
+    # Solo registrar y arrancar los jobs en el proceso hijo del reloader (evita duplicados)
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug:
+        from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
+        
+        # Alerta de stock bajo - configurable desde .env
+        if app.config.get('JOB_ALERTA_STOCK_ACTIVO', True):
+            scheduler.add_job(
+                id='alerta_stock_diaria',
+                func=verificar_stock_y_notificar,
+                args=[app],
+                trigger='cron',
+                hour=app.config.get('JOB_ALERTA_STOCK_HORA', 8),
+                minute=app.config.get('JOB_ALERTA_STOCK_MINUTO', 0)
+            )
+        
+        # Informe general de la mañana - configurable desde .env
+        if app.config.get('JOB_INFORME_MANANA_ACTIVO', True):
+            scheduler.add_job(
+                id='informe_general_manana',
+                func=generar_informe_general,
+                args=[app],
+                trigger='cron',
+                hour=app.config.get('JOB_INFORME_MANANA_HORA', 7),
+                minute=app.config.get('JOB_INFORME_MANANA_MINUTO', 0)
+            )
+        
+        # Informe general de la tarde - configurable desde .env
+        if app.config.get('JOB_INFORME_TARDE_ACTIVO', True):
+            scheduler.add_job(
+                id='informe_general_tarde',
+                func=generar_informe_general,
+                args=[app],
+                trigger='cron',
+                hour=app.config.get('JOB_INFORME_TARDE_HORA', 19),
+                minute=app.config.get('JOB_INFORME_TARDE_MINUTO', 0)
+            )
+        
         scheduler.start()
 
     # Registro de blueprints
