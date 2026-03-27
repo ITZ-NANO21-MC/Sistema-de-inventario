@@ -17,6 +17,13 @@
                             <div class="text-danger">{{ error }}</div>
                         {% endfor %}
                     </div>
+                    <div class="mb-3">
+                        {{ form.marca.label(class="form-label") }}
+                        {{ form.marca(class="form-select") }}
+                        {% for error in form.marca.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                     <a href="{{ url_for('modelo.listar') }}" class="btn btn-secondary">Cancelar</a>
                 </form>

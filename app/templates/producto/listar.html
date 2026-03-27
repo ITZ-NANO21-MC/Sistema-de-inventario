@@ -133,7 +133,12 @@
                         -
                     {% endif %}
                 </td>
-                <td>{{ producto.categoria }}</td>
+                <td>
+                    {{ producto.categoria }}
+                    {% if producto.marca %}
+                        <br><span class="badge bg-primary">{{ producto.marca }}</span>
+                    {% endif %}
+                </td>
                 <td>
                     <form action="{{ url_for('producto.actualizar_stock', id=producto.id) }}" method="POST" class="d-flex align-items-center" style="max-width: 120px;">
                         <input type="number" name="nuevo_stock" value="{{ producto.cantidad_stock }}" min="0" 

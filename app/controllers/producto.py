@@ -75,6 +75,7 @@ class ProductoController:
     def crear(data: dict, modelos_ids: list = None) -> Producto:
         producto = Producto(
             nombre=data['nombre'],
+            marca=data.get('marca', ''),
             descripcion=data.get('descripcion', ''),
             categoria=data['categoria'],
             cantidad_stock=data['cantidad_stock'],
@@ -104,6 +105,7 @@ class ProductoController:
         if not producto:
             return None
         producto.nombre = data['nombre']
+        producto.marca = data.get('marca', '')
         producto.descripcion = data.get('descripcion', '')
         producto.categoria = data['categoria']
         producto.cantidad_stock = data['cantidad_stock']

@@ -15,7 +15,7 @@ def listar():
 def crear():
     form = ModeloForm()
     if form.validate_on_submit():
-        modelo = ModeloTelefono(nombre=form.nombre.data)
+        modelo = ModeloTelefono(nombre=form.nombre.data, marca=form.marca.data)
         db.session.add(modelo)
         db.session.commit()
         flash('Modelo creado exitosamente', 'success')
@@ -29,6 +29,7 @@ def editar(id):
     form = ModeloForm(obj=modelo)
     if form.validate_on_submit():
         modelo.nombre = form.nombre.data
+        modelo.marca = form.marca.data
         db.session.commit()
         flash('Modelo actualizado', 'success')
         return redirect(url_for('modelo.listar'))

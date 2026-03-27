@@ -19,6 +19,23 @@ class ProductoForm(FlaskForm):
         ('cargador', 'Cargador'),
         ('otro', 'Otro')
     ], validators=[DataRequired()])
+    marca = SelectField('Marca', choices=[
+        ('', 'Seleccione una marca...'),
+        ('SAMSUNG', 'SAMSUNG'),
+        ('TECNO', 'TECNO'),
+        ('INFINIX', 'INFINIX'),
+        ('XIAOMI', 'XIAOMI'),
+        ('MOTOROLA', 'MOTOROLA'),
+        ('HUAWEI', 'HUAWEI'),
+        ('REALME', 'REALME'),
+        ('ALCATEL', 'ALCATEL'),
+        ('IPHONE', 'IPHONE'),
+        ('UMIDIGI', 'UMIDIGI'),
+        ('ZTE', 'ZTE'),
+        ('OPPO', 'OPPO'),
+        ('VIVO', 'VIVO'),
+        ('Otros', 'Otros')
+    ], validators=[Optional()])
     cantidad_stock = IntegerField('Cantidad en stock', validators=[DataRequired(), NumberRange(min=0)])
     stock_minimo = IntegerField('Stock mínimo', validators=[DataRequired(), NumberRange(min=1)])
     proveedor = StringField('Proveedor', validators=[Optional(), Length(max=100)])
@@ -40,4 +57,21 @@ class ProductoForm(FlaskForm):
 
 class ModeloForm(FlaskForm):
     nombre = StringField('Nombre del modelo', validators=[DataRequired(), Length(max=100)])
+    marca = SelectField('Marca', choices=[
+        ('', 'Seleccione una marca...'),
+        ('SAMSUNG', 'SAMSUNG'),
+        ('TECNO', 'TECNO'),
+        ('INFINIX', 'INFINIX'),
+        ('XIAOMI', 'XIAOMI'),
+        ('MOTOROLA', 'MOTOROLA'),
+        ('HUAWEI', 'HUAWEI'),
+        ('REALME', 'REALME'),
+        ('ALCATEL', 'ALCATEL'),
+        ('IPHONE', 'IPHONE'),
+        ('UMIDIGI', 'UMIDIGI'),
+        ('ZTE', 'ZTE'),
+        ('OPPO', 'OPPO'),
+        ('VIVO', 'VIVO'),
+        ('Otros', 'Otros')
+    ], validators=[Optional()])
 

@@ -8,6 +8,7 @@ class Producto(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.String(200), nullable=True)
     categoria = db.Column(db.String(50), nullable=False)
+    marca = db.Column(db.String(50), nullable=True)
     cantidad_stock = db.Column(db.Integer, default=0)
     stock_minimo = db.Column(db.Integer, default=5)
     proveedor = db.Column(db.String(100), nullable=True)
@@ -36,6 +37,7 @@ class ModeloTelefono(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False, unique=True)
+    marca = db.Column(db.String(50), nullable=True)
 
     productos = db.relationship('Producto', secondary='compatibilidad',
                                 back_populates='modelos_compatibles')

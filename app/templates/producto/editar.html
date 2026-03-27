@@ -31,10 +31,18 @@
 
                     <div class="mb-3">
                         {{ form.categoria.label(class="form-label") }}
-                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else ""),
-                        id="categoria") }}
+                        {{ form.categoria(class="form-select" + (" is-invalid" if form.categoria.errors else ""), id="categoria") }}
                         {% for error in form.categoria.errors %}
                         <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Campo de marca (visible solo para pantallas) -->
+                    <div class="mb-3" id="marca-field" style="display: {% if producto.categoria == 'pantalla' %}block{% else %}none{% endif %};">
+                        {{ form.marca.label(class="form-label") }}
+                        {{ form.marca(class="form-select" + (" is-invalid" if form.marca.errors else "")) }}
+                        {% for error in form.marca.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
                     </div>
 
@@ -161,15 +169,18 @@
         const categoriaSelect = document.getElementById('categoria');
         const modelosField = document.getElementById('modelos-field');
         const tecnicoField = document.getElementById('precio-tecnico-field');
+        const marcaField = document.getElementById('marca-field');
         const checkboxes = modelosField.querySelectorAll('input[type=checkbox]');
 
         function togglePantallaFields() {
             if (categoriaSelect.value === 'pantalla') {
                 modelosField.style.display = 'block';
+                if (marcaField) marcaField.style.display = 'block';
                 if (tecnicoField) tecnicoField.style.display = 'flex';
                 checkboxes.forEach(cb => cb.disabled = false);
             } else {
                 modelosField.style.display = 'none';
+                if (marcaField) marcaField.style.display = 'none';
                 if (tecnicoField) tecnicoField.style.display = 'none';
                 checkboxes.forEach(cb => cb.disabled = true);
             }

@@ -55,6 +55,7 @@ def crear():
     if form.validate_on_submit():
         data = {
             'nombre': form.nombre.data,
+            'marca': form.marca.data,
             'descripcion': form.descripcion.data,
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,
@@ -96,6 +97,7 @@ def editar(id):
         print("Modelos compatibles (enviados):", form.modelos_compatibles.data)
         data = {
             'nombre': form.nombre.data,
+            'marca': form.marca.data,
             'descripcion': form.descripcion.data,
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,

@@ -14,6 +14,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
+                <th>Marca</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -22,6 +23,13 @@
             <tr>
                 <td>{{ modelo.id }}</td>
                 <td>{{ modelo.nombre }}</td>
+                <td>
+                    {% if modelo.marca %}
+                        <span class="badge bg-primary">{{ modelo.marca }}</span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
                 <td>
                     <a href="{{ url_for('modelo.editar', id=modelo.id) }}" class="btn btn-sm btn-warning">
                         <i class="fas fa-edit"></i>
@@ -35,7 +43,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="3" class="text-center">No hay modelos registrados.</td>
+                <td colspan="4" class="text-center">No hay modelos registrados.</td>
             </tr>
             {% endfor %}
         </tbody>
