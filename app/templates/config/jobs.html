@@ -78,6 +78,37 @@
                             <small class="text-muted">Ejemplo: 36 = 1 USD equivale a 36 Bs</small>
                         </div>
                     </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope"></i> Configuración de Correo Electrónico
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Configura la cuenta desde la que se enviarán las alertas y los informes, y a qué correo llegarán como destinatario.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Correo Remitente (Ej: sistema@gmail.com)</label>
+                            <input type="email" class="form-control" name="mail_username" 
+                                   value="{{ mail_username }}" placeholder="tucorreo@gmail.com">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Clave de Aplicación (16 letras)</label>
+                            <input type="password" class="form-control" name="mail_password" 
+                                   placeholder="{% if has_mail_password %}******** (Dejar vacío para mantener){% else %}Ingresa clave de app de Google{% endif %}">
+                            <small class="text-muted"><a href="https://support.google.com/accounts/answer/185833" target="_blank">¿Cómo generar una clave en Gmail?</a></small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Correo Destinatario (A donde llegan informes)</label>
+                            <input type="email" class="form-control" name="mail_default_sender" 
+                                   value="{{ mail_default_sender }}" placeholder="jefe@empresa.com">
+                        </div>
+                    </div>
                 </div>
             </div>
             

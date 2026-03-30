@@ -45,7 +45,14 @@ def panel():
     # Obtener tasa de cambio
     tasa_cambio = os.environ.get('TASA_CAMBIO_USD_BS', '0')
     
-    return render_template('config/jobs.html', jobs=jobs, tasa_cambio=tasa_cambio)
+    # Obtener configuración de correo
+    mail_username = os.environ.get('MAIL_USERNAME', '')
+    mail_default_sender = os.environ.get('MAIL_DEFAULT_SENDER', '')
+    has_mail_password = bool(os.environ.get('MAIL_PASSWORD'))
+    
+    return render_template('config/jobs.html', jobs=jobs, tasa_cambio=tasa_cambio, 
+                           mail_username=mail_username, mail_default_sender=mail_default_sender, 
+                           has_mail_password=has_mail_password)
 
 
 @config_bp.route('/configuracion/jobs/actualizar', methods=['POST'])
@@ -112,6 +119,29 @@ def actualizar_jobs():
     update_env_value(env_path, 'TASA_CAMBIO_USD_BS', tasa_cambio)
     os.environ['TASA_CAMBIO_USD_BS'] = str(tasa_cambio)
     Config.TASA_CAMBIO_USD_BS = nueva_tasa
+
+    # Guardar configuración de correo
+    mail_username = request.form.get('mail_username', '').strip()
+    mail_password = request.form.get('mail_password', '').strip()
+    mail_default_sender = request.form.get('mail_default_sender', '').strip()
+    
+    if mail_username:
+        update_env_value(env_path, 'MAIL_USERNAME', mail_username)
+        os.environ['MAIL_USERNAME'] = mail_username
+        if 'mail' in current_app.extensions:
+            current_app.extensions['mail'].username = mail_username
+
+    if mail_password:
+        update_env_value(env_path, 'MAIL_PASSWORD', mail_password)
+        os.environ['MAIL_PASSWORD'] = mail_password
+        if 'mail' in current_app.extensions:
+            current_app.extensions['mail'].password = mail_password
+
+    if mail_default_sender:
+        update_env_value(env_path, 'MAIL_DEFAULT_SENDER', mail_default_sender)
+        os.environ['MAIL_DEFAULT_SENDER'] = mail_default_sender
+        if 'mail' in current_app.extensions:
+            current_app.extensions['mail'].default_sender = mail_default_sender
 
     mensaje_extra = ""
     # Si la tasa cambió de forma válida, actualizar inventario
