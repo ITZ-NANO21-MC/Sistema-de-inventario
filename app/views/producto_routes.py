@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, send_file
 from app.controllers.producto import ProductoController
 from app.forms import ProductoForm
 from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
@@ -172,3 +172,85 @@ def actualizar_stock(id):
         flash('Cantidad de stock inválida', 'danger')
         
     return redirect(request.referrer or url_for('producto.listar'))
+
+@producto_bp.route('/exportar-excel')
+def exportar_excel():
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from io import BytesIO
+    from datetime import datetime
+    
+    productos = ProductoController.obtener_todos()
+    
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Inventario de Productos'
+    
+    # Estilos
+    header_font = Font(bold=True, color='FFFFFF', size=11)
+    header_fill = PatternFill(start_color='2E86C1', end_color='2E86C1', fill_type='solid')
+    header_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    thin_border = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'), bottom=Side(style='thin')
+    )
+    
+    # Encabezados
+    headers = [
+        'ID', 'Nombre', 'Marca', 'Categoría', 'Descripción',
+        'Stock', 'Stock Mínimo', 'Proveedor',
+        'Precio Mayor (USD)', 'Precio Mayor (Bs)',
+        'Precio Detal (USD)', 'Precio Detal (Bs)',
+        'Precio Técnico (USD)', 'Precio Técnico (Bs)',
+        'Modelos Compatibles'
+    ]
+    
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = header_alignment
+        cell.border = thin_border
+    
+    # Datos
+    for row, p in enumerate(productos, 2):
+        modelos = ', '.join([m.nombre for m in p.modelos_compatibles]) if p.modelos_compatibles else '-'
+        
+        values = [
+            p.id, p.nombre, p.marca or '-', p.categoria, p.descripcion or '-',
+            p.cantidad_stock, p.stock_minimo, p.proveedor or '-',
+            float(p.precio_mayor_usd or 0), float(p.precio_mayor_bs or 0),
+            float(p.precio_detal_usd or 0), float(p.precio_detal_bs or 0),
+            float(p.precio_tecnico_usd or 0), float(p.precio_tecnico_bs or 0),
+            modelos
+        ]
+        
+        for col, value in enumerate(values, 1):
+            cell = ws.cell(row=row, column=col, value=value)
+            cell.border = thin_border
+            if isinstance(value, float):
+                cell.number_format = '#,##0.00'
+    
+    # Auto-ajustar ancho de columnas
+    for col in ws.columns:
+        max_length = 0
+        col_letter = col[0].column_letter
+        for cell in col:
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+        ws.column_dimensions[col_letter].width = min(max_length + 3, 40)
+    
+    # Guardar en memoria
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    fecha = datetime.now().strftime('%Y-%m-%d')
+    filename = f'inventario_productos_{fecha}.xlsx'
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=filename
+    )
