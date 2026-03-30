@@ -38,6 +38,11 @@ class Config:
     JOB_INFORME_TARDE_MINUTO = int(os.environ.get('JOB_INFORME_TARDE_MINUTO', 0))
     JOB_INFORME_TARDE_ACTIVO = os.environ.get('JOB_INFORME_TARDE_ACTIVO', 'true').lower() in ['true', '1']
     
+    # Configuración de Jobs - Respaldo Diario
+    JOB_BACKUP_HORA = int(os.environ.get('JOB_BACKUP_HORA', 21))
+    JOB_BACKUP_MINUTO = int(os.environ.get('JOB_BACKUP_MINUTO', 0))
+    JOB_BACKUP_ACTIVO = os.environ.get('JOB_BACKUP_ACTIVO', 'true').lower() in ['true', '1']
+    
     # Configuración de Tasa de Cambio
     TASA_CAMBIO_USD_BS = float(os.environ.get('TASA_CAMBIO_USD_BS', 0))
     
