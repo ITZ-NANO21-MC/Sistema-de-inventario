@@ -60,6 +60,19 @@ def create_app(config_class=Config):
                 hour=app.config.get('JOB_INFORME_TARDE_HORA', 19),
                 minute=app.config.get('JOB_INFORME_TARDE_MINUTO', 0)
             )
+            
+        # Respaldo diario de base de datos - configurable desde .env
+        if app.config.get('JOB_BACKUP_ACTIVO', True):
+            # Se requiere importar aquí para evitar ciclos si está en otro lado
+            from app.services.alertas import realizar_backup_automatico
+            scheduler.add_job(
+                id='backup_diario',
+                func=realizar_backup_automatico,
+                args=[app],
+                trigger='cron',
+                hour=app.config.get('JOB_BACKUP_HORA', 21), # Default 9:00 PM
+                minute=app.config.get('JOB_BACKUP_MINUTO', 0)
+            )
         
         scheduler.start()
 

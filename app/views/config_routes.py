@@ -22,6 +22,11 @@ JOBS_CONFIG = {
         'nombre': 'Informe General Tarde',
         'prefix': 'JOB_INFORME_TARDE',
         'descripcion': 'Envía un informe completo del inventario por la tarde'
+    },
+    'backup_diario': {
+        'nombre': 'Respaldo Diario (Backup)',
+        'prefix': 'JOB_BACKUP',
+        'descripcion': 'Envía una copia de la base de datos comprimida en .zip por correo'
     }
 }
 
@@ -60,7 +65,7 @@ def actualizar_jobs():
     """Guarda la configuración en archivo .env."""
     env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
     
-    jobs_to_update = ['alerta_stock_diaria', 'informe_general_manana', 'informe_general_tarde']
+    jobs_to_update = ['alerta_stock_diaria', 'informe_general_manana', 'informe_general_tarde', 'backup_diario']
     
     scheduler = current_app.extensions.get('scheduler')
     
@@ -93,8 +98,15 @@ def actualizar_jobs():
                     scheduler.reschedule_job(job_id, trigger='cron', hour=int(hora), minute=int(minuto))
                 else:
                     # Si no existe, lo agregamos llamando a la función correspondiente
-                    from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
-                    func = verificar_stock_y_notificar if job_id == 'alerta_stock_diaria' else generar_informe_general
+                    from app.services.alertas import verificar_stock_y_notificar, generar_informe_general, realizar_backup_automatico
+                    
+                    if job_id == 'alerta_stock_diaria':
+                        func = verificar_stock_y_notificar
+                    elif job_id == 'backup_diario':
+                        func = realizar_backup_automatico
+                    else:
+                        func = generar_informe_general
+                        
                     scheduler.add_job(
                         id=job_id,
                         func=func,
@@ -182,3 +194,40 @@ def update_env_value(env_path, key, value):
     
     with open(env_path, 'w') as f:
         f.writelines(lines)
+
+@config_bp.route('/configuracion/backup-manual')
+def backup_manual():
+    """Ruta para descargar la base de datos comprimida en .zip manualmente"""
+    import zipfile
+    import io
+    from datetime import datetime
+    from flask import send_file
+    
+    db_uri = current_app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    if not db_uri.startswith('sqlite:///'):
+        flash('El backup manual solo está disponible para bases de datos SQLite locales.', 'danger')
+        return redirect(url_for('config.panel'))
+
+    db_path = db_uri.replace('sqlite:///', '')
+    if not os.path.isabs(db_path):
+        db_path = os.path.join(current_app.instance_path, db_path)
+        
+    if not os.path.exists(db_path):
+        flash('No se encontró el archivo de base de datos.', 'danger')
+        return redirect(url_for('config.panel'))
+        
+    fecha_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    zip_filename = f"respaldo_inventario_{fecha_str}.zip"
+    
+    mem_zip = io.BytesIO()
+    with zipfile.ZipFile(mem_zip, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.write(db_path, arcname=f"inventario_{fecha_str}.db")
+        
+    mem_zip.seek(0)
+    
+    return send_file(
+        mem_zip,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name=zip_filename
+    )

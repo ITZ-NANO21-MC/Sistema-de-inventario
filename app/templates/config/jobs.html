@@ -12,6 +12,20 @@
             <strong>Nota:</strong> Los cambios en esta configuración se aplican de inmediato y se guardan de forma persistente.
         </div>
         
+        <div class="card mb-4 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-database"></i> Respaldo del Sistema Manual
+                </h5>
+            </div>
+            <div class="card-body">
+                <p>Descarga la base de datos completa inmediatamente a tu computadora comprimida en un archivo <strong>.zip</strong>. Esto es útil antes de hacer cambios importantes.</p>
+                <a href="{{ url_for('config.backup_manual') }}" class="btn btn-outline-success">
+                    <i class="fas fa-download"></i> Descargar Respaldo Ahora
+                </a>
+            </div>
+        </div>
+        
         <form action="{{ url_for('config.actualizar_jobs') }}" method="POST">
             {% for job in jobs %}
             <div class="card mb-3">

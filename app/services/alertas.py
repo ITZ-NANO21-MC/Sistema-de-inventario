@@ -95,3 +95,62 @@ def enviar_informe_general_email(app, productos, estadisticas):
         app.logger.info(f"Informe general ({estadisticas['periodo']}) enviado exitosamente.")
     except Exception as e:
         app.logger.error(f"Error al enviar informe general: {str(e)}")
+
+def realizar_backup_automatico(app):
+    """
+    Realiza un respaldo de la base de datos (inventario.db),
+    lo comprime en un .zip y lo envía por correo electrónico al administrador.
+    """
+    from app import mail
+    from flask_mail import Message
+    import os
+    import zipfile
+    from datetime import datetime
+    import io
+
+    with app.app_context():
+        # Ruta dinámica a la base de datos
+        db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+        if not db_uri.startswith('sqlite:///'):
+            app.logger.error("El backup automático solo soporta bases de datos SQLite locales.")
+            return
+
+        db_path = db_uri.replace('sqlite:///', '')
+        if not os.path.isabs(db_path):
+            db_path = os.path.join(app.instance_path, db_path)
+            
+        if not os.path.exists(db_path):
+            app.logger.error(f"Archivo de base de datos no encontrado en {db_path}.")
+            return
+
+        # Crear nombre de archivo basado en fecha y hora
+        fecha_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        zip_filename = f"respaldo_inventario_{fecha_str}.zip"
+        
+        # Comprimir en memoria usando BytesIO
+        mem_zip = io.BytesIO()
+        with zipfile.ZipFile(mem_zip, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.write(db_path, arcname=f"inventario_{fecha_str}.db")
+        
+        mem_zip.seek(0)
+        
+        # Preparar email
+        asunto = f"💾 Respaldo de Base de Datos - {datetime.now().strftime('%Y-%m-%d')}"
+        destinatario = os.environ.get('MAIL_DEFAULT_SENDER')
+        
+        # Cuerpo simple, o plantilla
+        html_body = f"""
+        <h3>Respaldo del Sistema de Inventario</h3>
+        <p>Adjunto encontrarás el respaldo de la base de datos generado el <strong>{datetime.now().strftime('%d/%m/%Y a las %I:%M %p')}</strong>.</p>
+        <p>Este archivo .zip contiene la base de datos SQLite con todos tus productos, categorías y stock actual.</p>
+        <p><i>Guárdalo en un lugar seguro.</i></p>
+        """
+        
+        msg = Message(subject=asunto, recipients=[destinatario], html=html_body)
+        msg.attach(zip_filename, 'application/zip', mem_zip.read())
+        
+        try:
+            mail.send(msg)
+            app.logger.info("Respaldo de base de datos enviado por correo exitosamente.")
+        except Exception as e:
+            app.logger.error(f"Error al enviar correo de respaldo: {str(e)}")
