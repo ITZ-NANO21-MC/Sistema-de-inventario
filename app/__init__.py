@@ -35,9 +35,10 @@ def create_app(config_class=Config):
         'font-src': ['\'self\'']
     }
     
-    # Iniciar Talisman. Desactivamos force_https en local (cuando FLASK_DEBUG es true)
-    is_debug = os.environ.get('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
-    Talisman(app, content_security_policy=csp, force_https=not is_debug)
+    # Iniciar Talisman. HTTPS solo se fuerza si se configura explícitamente en .env
+    # Para el servidor de desarrollo Flask (HTTP), FORCE_HTTPS debe ser False.
+    force_https = os.environ.get('FORCE_HTTPS', 'False').lower() in ['true', '1', 't']
+    Talisman(app, content_security_policy=csp, force_https=force_https)
 
     # Configuración de APScheduler
     scheduler.init_app(app)
