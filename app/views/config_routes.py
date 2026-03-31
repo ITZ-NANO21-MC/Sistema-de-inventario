@@ -3,7 +3,14 @@ import os
 from dotenv import load_dotenv
 from config import Config
 
+from flask_login import login_required
+
 config_bp = Blueprint('config', __name__, template_folder='../templates/config')
+
+@config_bp.before_request
+@login_required
+def require_login():
+    pass
 
 load_dotenv()
 

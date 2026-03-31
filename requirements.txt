@@ -8,4 +8,5 @@ wtforms
 email-validator
 dotenv
 pytest
+flask-login
 

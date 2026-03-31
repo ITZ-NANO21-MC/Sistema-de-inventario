@@ -1,7 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, current_app
 from app.controllers.alertas import AlertaController
 
+from flask_login import login_required
+
 alertas_bp = Blueprint('alertas', __name__)
+
+@alertas_bp.before_request
+@login_required
+def require_login():
+    pass
 
 
 @alertas_bp.route('/alertas')

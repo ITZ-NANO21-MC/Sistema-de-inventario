@@ -3,7 +3,14 @@ from app.models import ModeloTelefono
 from app.forms import ModeloForm
 from app import db
 
+from flask_login import login_required
+
 modelo_bp = Blueprint('modelo', __name__, template_folder='../templates/modelo')
+
+@modelo_bp.before_request
+@login_required
+def require_login():
+    pass
 
 @modelo_bp.route('/')
 def listar():

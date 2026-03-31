@@ -5,7 +5,14 @@ from app.services.alertas import verificar_stock_y_notificar, generar_informe_ge
 from app import db
 from config import Config
 
+from flask_login import login_required
+
 producto_bp = Blueprint('producto', __name__, template_folder='../templates/producto')
+
+@producto_bp.before_request
+@login_required
+def require_login():
+    pass
 
 def get_tasa_cambio():
     return Config.TASA_CAMBIO_USD_BS

@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_apscheduler import APScheduler
+from flask_login import LoginManager
 from config import Config
 import os
 
@@ -10,6 +11,10 @@ db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
 scheduler = APScheduler()
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.login_message = 'Por favor, inicie sesión para acceder a esta página.'
+login_manager.login_message_category = 'warning'
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -18,6 +23,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
+    login_manager.init_app(app)
 
     # Configuración de APScheduler
     scheduler.init_app(app)
@@ -81,11 +87,19 @@ def create_app(config_class=Config):
     from app.views.modelo_routes import modelo_bp
     from app.views.config_routes import config_bp
     from app.views.alertas_routes import alertas_bp
+    from app.views.auth_routes import auth_bp
 
     app.register_blueprint(producto_bp, url_prefix='/productos')
     app.register_blueprint(modelo_bp, url_prefix='/modelos')
     app.register_blueprint(config_bp)
     app.register_blueprint(alertas_bp)
+    app.register_blueprint(auth_bp)
+
+    # Cargar usuario para Flask-Login
+    from app.models import Usuario
+    @login_manager.user_loader
+    def load_user(user_id):
+        return Usuario.query.get(int(user_id))
 
     # Context processor para pasar productos_bajos_count a todas las plantillas
     @app.context_processor

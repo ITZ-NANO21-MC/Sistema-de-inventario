@@ -1,8 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SelectField, TextAreaField, SelectMultipleField, DecimalField
+from wtforms import StringField, IntegerField, SelectField, TextAreaField, SelectMultipleField, DecimalField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional
 from wtforms import widgets
 from app.models import ModeloTelefono
+
+class LoginForm(FlaskForm):
+    username = StringField('Usuario', validators=[DataRequired()])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
+    remember_me = BooleanField('Recuérdame')
 
 class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
