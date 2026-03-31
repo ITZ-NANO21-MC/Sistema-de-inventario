@@ -1,251 +1,148 @@
-# AGENTS.md - Guidelines for Agentic Coding in Inventario App
+# AGENTS.md - Inventario App
 
-## Project Overview
-This is a Flask web application for inventory management with SQLAlchemy ORM. The application manages products, phone models, and their compatibility relationships.
+Flask inventory management web app with SQLAlchemy ORM. Manages products, phone models, and compatibility relationships.
 
 ## Directory Structure
 ```
-inventario_app/
-├── app/
-│   ├── __init__.py          # Application factory
-│   ├── controllers/         # Business logic controllers
-│   ├── models.py            # Database models
-│   ├── services/            # Service layer
-│   ├── views/               # View functions/routes
-│   ├── templates/           # HTML templates
-│   └── static/              # Static assets (CSS, JS, images)
-├── migrations/              # Alembic database migrations
-├── instance/                # Instance-specific files (database, config)
-├── config.py                # Configuration settings
-├── run.py                   # Application entry point
-└── requirements.txt         # Python dependencies
+app/
+├── __init__.py          # App factory
+├── controllers/         # Business logic
+├── models.py            # DB models
+├── services/            # Service layer
+├── views/               # Routes
+├── templates/           # HTML templates
+└── static/              # CSS, JS, images
 ```
 
-## Development Commands
+## Commands
 
-### Environment Setup
+### Setup
 ```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-
-# Install development dependencies
-pip install pytest flake8 black isort
 ```
 
-### Running the Application
+### Run
 ```bash
-# Development server
-python run.py
-
-# Production server (example)
-gunicorn --bind 0.0.0.0:5000 run:app
+python run.py                          # Dev server
+gunicorn --bind 0.0.0.0:5000 run:app   # Prod
 ```
 
-### Testing
+### Test (pytest)
 ```bash
-# Run all tests
-pytest
-
-# Run tests with coverage
-pytest --cov=app --cov-report=term-missing
-
-# Run a specific test file
-pytest tests/test_producto.py
-
-# Run a specific test function
-pytest tests/test_producto.py::test_crear_producto
-
-# Run tests with verbose output
-pytest -v
+pytest                                 # All tests
+pytest tests/test_file.py              # Single file
+pytest tests/test_file.py::test_func   # Single test
+pytest -v                              # Verbose
+pytest --cov=app --cov-report=term-missing  # Coverage
 ```
 
-### Linting and Formatting
+### Lint & Format
 ```bash
-# Check code style with flake8
-flake8 app/
-
-# Auto-format with black
-black app/
-
-# Sort imports with isort
-isort app/
-
-# Run all formatting checks
-flake8 app/ && black --check app/ && isort --check-only app/
+flake8 app/                            # Lint
+black app/                             # Format
+isort app/                             # Sort imports
+flake8 app/ && black --check app/ && isort --check-only app/  # Check all
 ```
 
-### Database Management
+### Database
 ```bash
-# Initialize database (handled automatically in run.py)
-# For manual initialization:
-flask db init
-
-# Create migration
-flask db migrate -m "description"
-
-# Apply migration
-flask db upgrade
-
-# Rollback migration
-flask db downgrade
+flask db migrate -m "description"      # Create migration
+flask db upgrade                       # Apply
+flask db downgrade                     # Rollback
 ```
 
-## Code Style Guidelines
+## Code Style
 
-### Python Version
-Target Python 3.8+ for compatibility with dependencies.
-
-### Import Organization
-1. Standard library imports (alphabetically)
-2. Third-party imports (alphabetically)
-3. Local application imports (alphabetically)
-4. Separate each section with a blank line
-
-Example:
+### Imports
+Order: stdlib → third-party → local (each alphabetically, blank line between groups)
 ```python
 import os
-import sys
 from typing import Optional, List
 
-from flask import Flask
-from sqlalchemy import Integer, String
-from sqlalchemy.orm import declarative_base
+from flask import Flask, current_app
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.models import Producto
 ```
 
-### Formatting (Black)
-- Line length: 88 characters (Black default)
-- Use trailing commas in multi-line expressions
-- No unnecessary blank lines
-- Black handles most formatting automatically
+### Formatting
+- Black (88 char line length)
+- Trailing commas in multi-line expressions
+- Run `black app/` before committing
 
 ### Type Hints
-- Use type hints for all function parameters and return values
-- Use `Optional[T]` for values that can be None
-- Use `List[T]`, `Dict[K, V]` for collections
-- Import typing constructs from `typing` module
-
-Example:
+Use for all parameters and returns. Use `Optional[T]`, `List[T]`, `Dict[K, V]`.
 ```python
 def obtener_por_id(id: int) -> Optional[Producto]:
     return Producto.query.get(id)
 ```
 
-### Naming Conventions
-- Classes: PascalCase (e.g., `ProductoController`)
-- Functions and variables: snake_case (e.g., `obtener_todos`)
-- Constants: UPPER_SNAKE_CASE (e.g., `MAX_STOCK`)
-- Private methods/variables: _leading_underscore
-- Database tables: lowercase with underscores (e.g., `productos`)
-- Database columns: lowercase with underscores
+### Naming
+- Classes: `PascalCase` (ProductoController)
+- Functions/variables: `snake_case` (obtener_todos)
+- Constants: `UPPER_SNAKE_CASE` (MAX_STOCK)
+- Private: `_leading_underscore`
+- DB tables/columns: `lowercase_underscore`
 
 ### Docstrings
-- Use triple double quotes for docstrings
-- Follow Google-style or NumPy-style docstrings
-- Document parameters, return values, and exceptions
-- For simple one-line functions, a brief description is sufficient
-
-Example:
+Triple double quotes, Google/NumPy style.
 ```python
 def crear(data: dict, modelos_ids: list = None) -> Producto:
     """Create a new product with optional compatible models.
     
     Args:
-        data: Dictionary containing product information
-        modelos_ids: List of model IDs compatible with this product
+        data: Product data dictionary
+        modelos_ids: Compatible model IDs
         
     Returns:
-        Producto: The created product instance
+        Created product instance
     """
 ```
 
 ### Error Handling
-- Catch specific exceptions rather than bare `except`
-- Log errors appropriately using Flask's logger
-- Return meaningful error messages to users
-- In controllers, raise exceptions that can be handled by error handlers
-
-Example:
+Catch specific exceptions, log with `current_app.logger`, rollback DB on errors.
 ```python
 try:
     db.session.commit()
 except Exception as e:
     db.session.rollback()
-    current_app.logger.error(f"Error saving product: {e}")
+    current_app.logger.error(f"Error: {e}")
     raise
 ```
 
-### Flask-Specific Guidelines
-- Use application factory pattern (already implemented)
-- Access current app via `current_app` proxy
-- Use `url_for()` for generating URLs
-- Use flash messages for user feedback
-- Implement proper error handlers (404, 500, etc.)
+### Flask
+- Use application factory pattern
+- Access app via `current_app` proxy
+- Use `url_for()` for URLs
+- Flash messages for user feedback
+- Implement 404/500 error handlers
 
-### SQLAlchemy Guidelines
-- Use relationship loading options (`joinedload`, `selectinload`) to avoid N+1 queries
-- Commit transactions explicitly
-- Rollback on exceptions
-- Use model methods for business logic when appropriate
+### SQLAlchemy
+- Use `joinedload`/`selectinload` to avoid N+1 queries
+- Explicit commit/rollback
 - Keep models focused on data representation
 
-### Controller Layer
-- Controllers handle business logic
-- Keep controllers thin; move complex logic to services
-- Static methods are acceptable for stateless operations
-- Return model instances or None/not found indicators
+### Controllers
+- Thin controllers; complex logic → services
+- Static methods OK for stateless operations
 - Handle validation in controllers or forms
 
 ### Security
-- Validate all user input
-- Use parameterized queries to prevent SQL injection
-- Implement CSRF protection for forms
-- Hash passwords (if authentication is added)
-- Use Flask-WTF for secure forms when applicable
+- Validate all input
+- Parameterized queries (SQLAlchemy handles this)
+- CSRF protection via Flask-WTF
+- Use Flask-Talisman for security headers
 
-### Testing Guidelines
-- Write unit tests for controllers and models
-- Use pytest fixtures for database setup/teardown
+### Testing
+- Unit tests for controllers and models
+- Use pytest fixtures for DB setup
 - Mock external dependencies
-- Test both success and failure cases
-- Aim for high coverage of critical paths
-- Use factories (like factory_boy) for test data when needed
+- Test success and failure paths
+- No test suite exists yet — create one
 
-### Git Practices
-- Commit frequently with descriptive messages
-- Use feature branches for new work
-- Keep commits focused on single changes
-- Write clear commit messages explaining why
-- Follow conventional commits format when possible:
-  - feat: new feature
-  - fix: bug fix
-  - docs: documentation changes
-  - style: formatting changes
-  - refactor: code restructuring
-  - test: adding/modifying tests
-  - chore: maintenance tasks
-
-## Specific Project Observations
-
-Based on code review:
-- The project uses SQLAlchemy ORM with Flask
-- Models define many-to-many relationships through association table
-- Controllers use static methods for business logic
-- Debug prints are present in controller methods (should be replaced with logging)
-- Type hints are used selectively (should be expanded)
-- No explicit test suite exists yet
-
-## Recommended Next Steps
-1. Add proper logging instead of print statements
-2. Expand type hints throughout the codebase
-3. Implement a test suite with pytest
-4. Add flake8, black, and isort configuration files
-5. Consider adding service layer for complex business logic
-6. Implement input validation using WTForms or similar
-7. Add API endpoints if needed for frontend consumption
+### Git
+- Conventional commits: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chore:`
+- Feature branches, descriptive messages
+- Never commit secrets or `.env` files
