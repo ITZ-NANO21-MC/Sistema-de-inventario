@@ -7,7 +7,9 @@ env_path = os.path.join(basedir, '.env')
 load_dotenv(dotenv_path=env_path, override=True)  # Carga variables de entorno desde .env y sobrescribe
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave-secreta-para-desarrollo'
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    if not SECRET_KEY or SECRET_KEY == 'mi-clave-secreta-super-segura' or len(SECRET_KEY) < 32:
+        raise ValueError("No se ha configurado una SECRET_KEY segura en las variables de entorno.")
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///inventario.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
