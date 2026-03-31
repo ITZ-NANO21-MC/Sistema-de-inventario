@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from config import Config
 
 from flask_login import login_required
+from app.services.audit import registrar_evento
 
 config_bp = Blueprint('config', __name__, template_folder='../templates/config')
 
@@ -178,6 +179,7 @@ def actualizar_jobs():
         db.session.commit()
         mensaje_extra = f" Se actualizaron los precios en Bs de {len(productos)} productos."
 
+    registrar_evento('MODIFICAR_CONFIGURACION', f'Configuración del sistema actualizada.{mensaje_extra}')
     flash(f'Configuración guardada y jobs actualizados con éxito.{mensaje_extra}', 'success')
     return redirect(url_for('config.panel'))
 

@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, current_user
 from app.models import Usuario
 from app.forms import LoginForm
 from urllib.parse import urlparse
+from app.services.audit import registrar_evento
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -15,10 +16,12 @@ def login():
     if form.validate_on_submit():
         user = Usuario.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
+            registrar_evento('LOGIN_FALLIDO', f"Intento fallido para usuario='{form.username.data}' desde IP={request.remote_addr}", usuario=form.username.data)
             flash('Usuario o contraseña inválidos', 'danger')
             return redirect(url_for('auth.login'))
             
         login_user(user, remember=form.remember_me.data)
+        registrar_evento('LOGIN_EXITOSO', f"Inicio de sesión exitoso desde IP={request.remote_addr}", usuario=user.username)
         
         # Redirigir a la página que el usuario intentaba visitar (si existe)
         next_page = request.args.get('next')
@@ -32,6 +35,8 @@ def login():
 
 @auth_bp.route('/logout')
 def logout():
+    registrar_evento('LOGOUT', f"Cierre de sesión desde IP={request.remote_addr}")
     logout_user()
     flash('Has cerrado sesión.', 'info')
     return redirect(url_for('auth.login'))
+

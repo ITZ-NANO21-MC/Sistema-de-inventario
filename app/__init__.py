@@ -40,6 +40,10 @@ def create_app(config_class=Config):
     force_https = os.environ.get('FORCE_HTTPS', 'False').lower() in ['true', '1', 't']
     Talisman(app, content_security_policy=csp, force_https=force_https)
 
+    # Configuración del Logger de Auditoría de Seguridad
+    from app.services.audit import configurar_audit_logger
+    configurar_audit_logger(app)
+
     # Configuración de APScheduler
     scheduler.init_app(app)
     

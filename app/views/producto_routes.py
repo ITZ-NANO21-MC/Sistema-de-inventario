@@ -6,6 +6,7 @@ from app import db
 from config import Config
 
 from flask_login import login_required
+from app.services.audit import registrar_evento
 
 producto_bp = Blueprint('producto', __name__, template_folder='../templates/producto')
 
@@ -139,7 +140,11 @@ def editar(id):
 
 @producto_bp.route('/eliminar/<int:id>', methods=['POST'])
 def eliminar(id):
+    from app.models import Producto
+    producto = Producto.query.get(id)
+    nombre_producto = producto.nombre if producto else f'ID={id}'
     if ProductoController.eliminar(id):
+        registrar_evento('ELIMINAR_PRODUCTO', f"Producto eliminado: '{nombre_producto}' (ID={id})")
         flash('Producto eliminado', 'success')
     else:
         flash('Error al eliminar el producto', 'danger')
