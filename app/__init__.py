@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_apscheduler import APScheduler
 from flask_login import LoginManager
+from flask_talisman import Talisman
 from config import Config
 import os
 
@@ -24,6 +25,19 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     mail.init_app(app)
     login_manager.init_app(app)
+
+    # Configuración de CSP para Talisman (Mantiene la UI offline funcionando)
+    csp = {
+        'default-src': ['\'self\''],
+        'script-src': ['\'self\'', '\'unsafe-inline\''],
+        'style-src': ['\'self\'', '\'unsafe-inline\''],
+        'img-src': ['\'self\'', 'data:'],
+        'font-src': ['\'self\'']
+    }
+    
+    # Iniciar Talisman. Desactivamos force_https en local (cuando FLASK_DEBUG es true)
+    is_debug = os.environ.get('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
+    Talisman(app, content_security_policy=csp, force_https=not is_debug)
 
     # Configuración de APScheduler
     scheduler.init_app(app)

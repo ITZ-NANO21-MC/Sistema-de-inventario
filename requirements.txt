@@ -9,4 +9,5 @@ email-validator
 dotenv
 pytest
 flask-login
+flask-talisman
 
