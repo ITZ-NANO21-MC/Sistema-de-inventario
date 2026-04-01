@@ -1,0 +1,10 @@
+# Electron build artifacts
+dist/
+node_modules/
+backend/venv/
+resources/binaries/cloudflared.exe
+resources/binaries/cloudflared
+
+# OS files
+.DS_Store
+Thumbs.db
