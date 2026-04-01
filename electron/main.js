@@ -19,7 +19,7 @@ function getBinaryPath(binaryName) {
 function getProjectRoot() {
   const isDev = !app.isPackaged;
   if (isDev) {
-    return path.join(__dirname, '..', 'backend');
+    return path.join(__dirname, 'backend');
   }
   return path.join(process.resourcesPath, 'backend');
 }

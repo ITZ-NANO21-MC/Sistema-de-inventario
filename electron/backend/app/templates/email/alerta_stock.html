@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f4f4f4; color: #333; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .alert { color: #d9534f; font-weight: bold; }
+        .header { background-color: #0275d8; color: white; padding: 20px; text-align: center; }
+        .footer { margin-top: 30px; font-size: 0.8em; color: #777; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>⚠️ Reporte de Inventario: Stock Bajo</h2>
+    </div>
+    
+    <p>Hola,</p>
+    <p>El sistema automático ha detectado que los siguientes productos han alcanzado o se encuentran por debajo de su nivel de stock mínimo permitido y requieren atención para reabastecimiento:</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre del Producto</th>
+                <th>Categoría</th>
+                <th>Stock Actual</th>
+                <th>Mínimo Requerido</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.id }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.categoria }}</td>
+                <td class="alert">{{ producto.cantidad_stock }}</td>
+                <td>{{ producto.stock_minimo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <p>Por favor ingrese al sistema para más detalles.</p>
+    
+    <div class="footer">
+        <p>Este es un correo automático generado por el Sistema de Inventario. Por favor no responda a este correo.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Listado de Productos</h2>
+    <div>
+        <a href="{{ url_for('producto.crear') }}" class="btn btn-primary me-2">
+            <i class="fas fa-plus"></i> Nuevo Producto
+        </a>
+        <a href="{{ url_for('producto.enviar_alerta_manual') }}" class="btn btn-warning me-2">
+            <i class="fas fa-exclamation-triangle"></i> Alerta Stock Bajo
+        </a>
+        <a href="{{ url_for('producto.enviar_informe_manual') }}" class="btn btn-info text-white me-2">
+            <i class="fas fa-chart-bar"></i> Enviar Informe General
+        </a>
+        <a href="{{ url_for('producto.exportar_excel') }}" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Exportar a Excel
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="fas fa-search"></i> Buscar y Filtrar</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('producto.listar') }}" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Buscar por nombre</label>
+                <input type="text" class="form-control" name="busqueda" 
+                       value="{{ request.args.get('busqueda', '') }}" 
+                       placeholder="Nombre del producto...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Categoría</label>
+                <select class="form-select" name="categoria" id="filtro-categoria">
+                    <option value="">Todas</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat }}" {% if request.args.get('categoria') == cat %}selected{% endif %}>
+                        {{ cat }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2" id="filtro-marca-field" style="display: {% if request.args.get('categoria') == 'pantalla' %}block{% else %}none{% endif %};">
+                <label class="form-label">Marca</label>
+                <select class="form-select" name="marca">
+                    <option value="">Todas</option>
+                    {% for m in marcas %}
+                    <option value="{{ m }}" {% if request.args.get('marca') == m %}selected{% endif %}>
+                        {{ m }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Proveedor</label>
+                <input type="text" class="form-control" name="proveedor" 
+                       value="{{ request.args.get('proveedor', '') }}"
+                       placeholder="Nombre del proveedor...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Stock</label>
+                <select class="form-select" name="stock_bajo">
+                    <option value="">Todos</option>
+                    <option value="si" {% if request.args.get('stock_bajo') == 'si' %}selected{% endif %}>Stock Bajo</option>
+                    <option value="no" {% if request.args.get('stock_bajo') == 'no' %}selected{% endif %}>Stock Adecuado</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Rango de Stock</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="stock_minimo" 
+                           value="{{ request.args.get('stock_minimo', '') }}" placeholder="Mín">
+                    <span class="input-group-text">-</span>
+                    <input type="number" class="form-control" name="stock_maximo" 
+                           value="{{ request.args.get('stock_maximo', '') }}" placeholder="Máx">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Precio Mayor (Bs)</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="precio_min" 
+                           value="{{ request.args.get('precio_min', '') }}" placeholder="Mín" step="0.01">
+                    <span class="input-group-text">-</span>
+                    <input type="number" class="form-control" name="precio_max" 
+                           value="{{ request.args.get('precio_max', '') }}" placeholder="Máx" step="0.01">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Precio Mayor (USD)</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="precio_min_usd" 
+                           value="{{ request.args.get('precio_min_usd', '') }}" placeholder="Mín" step="0.01">
+                    <span class="input-group-text">-</span>
+                    <input type="number" class="form-control" name="precio_max_usd" 
+                           value="{{ request.args.get('precio_max_usd', '') }}" placeholder="Máx" step="0.01">
+                </div>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <a href="{{ url_for('producto.listar') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filtroCat = document.getElementById('filtro-categoria');
+    const filtroMarca = document.getElementById('filtro-marca-field');
+    
+    filtroCat.addEventListener('change', function() {
+        if (this.value === 'pantalla') {
+            filtroMarca.style.display = 'block';
+        } else {
+            filtroMarca.style.display = 'none';
+            // Limpiar selección de marca si se cambia de categoría
+            filtroMarca.querySelector('select').value = '';
+        }
+    });
+});
+</script>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Compatibilidad</th>
+                <th>Categoría</th>
+                <th>Stock</th>
+                <th>Stock Mínimo</th>
+                <th>Proveedor</th>
+                <th>Precio Mayor</th>
+                <th>Precio Detal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.id }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>
+                    {% if producto.descripcion %}
+                        <span title="{{ producto.descripcion }}">{{ producto.descripcion[:30] }}{% if producto.descripcion|length > 30 %}...{% endif %}</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if producto.categoria == 'pantalla' and producto.modelos_compatibles %}
+                        <span class="badge bg-info" title="{{ producto.modelos_compatibles|map(attribute='nombre')|join(', ') }}">
+                            {{ producto.modelos_compatibles|length }} modelo(s)
+                        </span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {{ producto.categoria }}
+                    {% if producto.marca %}
+                        <br><span class="badge bg-primary">{{ producto.marca }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form action="{{ url_for('producto.actualizar_stock', id=producto.id) }}" method="POST" class="d-flex align-items-center" style="max-width: 120px;">
+                        <input type="number" name="nuevo_stock" value="{{ producto.cantidad_stock }}" min="0" 
+                               class="form-control form-control-sm me-1 {% if producto.cantidad_stock < producto.stock_minimo %}is-invalid border-danger text-danger{% endif %}" 
+                               style="width: 70px;">
+                        <button type="submit" class="btn btn-sm btn-success p-1" title="Guardar Stock">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+                </td>
+                <td>{{ producto.stock_minimo }}</td>
+                <td>{{ producto.proveedor or '-' }}</td>
+                <td>
+                    {% if producto.precio_mayor_bs or producto.precio_mayor_usd %}
+                        <span class="text-success" title="Bs">{{ producto.precio_mayor_bs or '0' }} Bs</span><br>
+                        <span class="text-muted" title="USD">${{ producto.precio_mayor_usd or '0' }} USD</span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if producto.precio_detal_bs or producto.precio_detal_usd %}
+                        <div class="text-success fw-bold">{{ "%.2f"|format(producto.precio_detal_bs) }} Bs</div>
+                        <div class="text-muted small">{{ "%.2f"|format(producto.precio_detal_usd) }} USD</div>
+                        {% if producto.categoria == 'pantalla' %}
+                            <div class="mt-1">
+                                <span class="badge bg-warning text-dark" title="Costo Técnico">
+                                    <i class="fas fa-tools"></i> Costo: 
+                                    {% if producto.precio_tecnico_usd %}
+                                        {{ "%.2f"|format(producto.precio_tecnico_usd) }}$
+                                    {% else %}
+                                        0.00$
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% else %}
+                            <div class="mt-1">
+                                <span class="badge bg-secondary text-white" title="Costo Técnico no aplica">
+                                    <i class="fas fa-tools"></i> Costo: N/A
+                                </span>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('producto.editar', id=producto.id) }}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{{ url_for('producto.eliminar', id=producto.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este producto?');">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="11" class="text-center">No hay productos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
