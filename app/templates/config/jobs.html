@@ -7,6 +7,47 @@
             <i class="fas fa-cog"></i> Configuración de Jobs
         </h2>
         
+        {% if tunnel_status.activo %}
+        <div class="card mb-4 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-globe"></i> Túnel Activo
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">Tu aplicación está expuesta al internet a través de:</p>
+                <div class="alert alert-success d-flex align-items-center" role="alert">
+                    <i class="fas fa-link me-2"></i>
+                    <a href="{{ tunnel_status.url }}" target="_blank" class="fw-bold text-break">{{ tunnel_status.url }}</a>
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i>
+                    Tipo: {{ tunnel_status.tipo | capitalize }} |
+                    Comparte esta URL con personas autorizadas. La URL cambiará si reinicias el túnel.
+                </small>
+            </div>
+        </div>
+        {% else %}
+        <div class="card mb-4 border-secondary">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-globe"></i> Exposición al Internet
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">Tu aplicación solo es accesible localmente. Para exponerla al internet:</p>
+                <div class="alert alert-light border" role="alert">
+                    <code>python Scripts/tunnel.py</code>
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i>
+                    Requiere <code>cloudflared</code> o <code>zrok</code> instalado.
+                    <a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/" target="_blank">Descargar cloudflared</a>
+                </small>
+            </div>
+        </div>
+        {% endif %}
+        
         <div class="alert alert-info">
             <i class="fas fa-info-circle"></i>
             <strong>Nota:</strong> Los cambios en esta configuración se aplican de inmediato y se guardan de forma persistente.

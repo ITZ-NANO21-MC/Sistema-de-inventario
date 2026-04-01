@@ -107,12 +107,14 @@ def create_app(config_class=Config):
     from app.views.config_routes import config_bp
     from app.views.alertas_routes import alertas_bp
     from app.views.auth_routes import auth_bp
+    from app.views.tunnel_routes import tunnel_bp
 
     app.register_blueprint(producto_bp, url_prefix='/productos')
     app.register_blueprint(modelo_bp, url_prefix='/modelos')
     app.register_blueprint(config_bp)
     app.register_blueprint(alertas_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(tunnel_bp)
 
     # Cargar usuario para Flask-Login
     from app.models import Usuario
@@ -131,6 +133,12 @@ def create_app(config_class=Config):
         except:
             count = 0
         return dict(productos_bajos_count=count)
+
+    # Context processor para pasar estado del túnel a todas las plantillas
+    @app.context_processor
+    def inject_tunnel_status():
+        from app.services.tunnel import get_tunnel_status
+        return dict(tunnel_status=get_tunnel_status())
 
     # Ruta raíz redirige a lista de productos
     @app.route('/')

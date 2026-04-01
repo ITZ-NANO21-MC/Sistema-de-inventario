@@ -18,6 +18,7 @@ import time
 import re
 import shutil
 import threading
+import json
 
 
 class Colors:
@@ -197,7 +198,36 @@ def cleanup(processes):
             except subprocess.TimeoutExpired:
                 proc.kill()
                 print(f"{Colors.RED}[{name}] Forzado a detenerse.{Colors.END}")
+    clear_tunnel_status_file()
     print(f"{Colors.GREEN}Todos los servicios detenidos.{Colors.END}")
+
+
+def clear_tunnel_status_file():
+    """Elimina el archivo de estado del túnel."""
+    try:
+        project_root = find_project_root()
+        status_file = os.path.join(project_root, '.tunnel_status')
+        if os.path.exists(status_file):
+            os.remove(status_file)
+    except Exception:
+        pass
+
+
+def save_tunnel_status_file(project_root, url, tunnel_type):
+    """Guarda el estado del túnel para que Flask lo lea."""
+    status_file = os.path.join(project_root, '.tunnel_status')
+    data = {
+        'activo': True,
+        'url': url,
+        'tipo': tunnel_type,
+        'timestamp': time.time()
+    }
+    try:
+        with open(status_file, 'w') as f:
+            json.dump(data, f)
+        print(f"{Colors.GREEN}[Tunnel] Estado guardado para la app Flask.{Colors.END}")
+    except IOError as e:
+        print(f"{Colors.RED}[Tunnel] Error al guardar estado: {e}{Colors.END}")
 
 
 def main():
@@ -284,6 +314,9 @@ def main():
         sys.exit(1)
 
     processes['Tunnel'] = tunnel_proc
+
+    # Guardar estado del túnel para la app Flask
+    save_tunnel_status_file(project_root, url, args.tool)
 
     # Mantener el script activo
     try:
