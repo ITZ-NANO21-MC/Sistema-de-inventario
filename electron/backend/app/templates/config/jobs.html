@@ -98,36 +98,36 @@
         
         <form action="{{ url_for('config.actualizar_jobs') }}" method="POST">
             {% for job in jobs %}
-            <div class="card mb-3">
+            <div class="card mb-3 shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">
                         <i class="fas fa-clock"></i> {{ job.nombre }}
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">{{ job.descripcion }}</p>
+                    <p class="text-muted small mb-3">{{ job.descripcion }}</p>
                     
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label class="form-label">Hora (0-23)</label>
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small fw-bold">Hora (0-23)</label>
                             <input type="number" class="form-control" 
                                    name="{{ job.prefix }}_HORA" 
                                    value="{{ job.hora }}" min="0" max="23" required>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Minuto (0-59)</label>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small fw-bold">Minuto (0-59)</label>
                             <input type="number" class="form-control" 
                                    name="{{ job.prefix }}_MINUTO" 
                                    value="{{ job.minuto }}" min="0" max="59" required>
                         </div>
-                        <div class="col-md-6 d-flex align-items-center">
-                            <div class="form-check form-switch mt-4">
-                                <input class="form-check-input" type="checkbox" role="switch" 
+                        <div class="col-12 col-md-6 d-flex align-items-center">
+                            <div class="form-check form-switch mt-2 mt-md-4">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" 
                                        id="job_{{ job.id }}" 
                                        name="{{ job.prefix }}_ACTIVO"
                                        {% if job.activo %}checked{% endif %}>
                                 <label class="form-check-label" for="job_{{ job.id }}">
-                                    Job activo
+                                    <strong>Job activo</strong>
                                 </label>
                             </div>
                         </div>
@@ -136,18 +136,18 @@
             </div>
             {% endfor %}
             
-            <div class="card mb-3">
+            <div class="card mb-3 shadow-sm">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0">
                         <i class="fas fa-exchange-alt"></i> Tasa de Cambio
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Configura la tasa de cambio para convertir precios entre Bs y USD.</p>
+                    <p class="text-muted small">Configura la tasa de cambio para convertir precios entre Bs y USD.</p>
                     
                     <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Tasa de Cambio (USD a Bs)</label>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold">Tasa de Cambio (USD a Bs)</label>
                             <div class="input-group">
                                 <span class="input-group-text">1 USD = </span>
                                 <input type="number" class="form-control" 
@@ -159,36 +159,35 @@
                                        required>
                                 <span class="input-group-text">Bs</span>
                             </div>
-                            <small class="text-muted">Ejemplo: 36 = 1 USD equivale a 36 Bs</small>
+                            <small class="text-muted d-block mt-1">Ejemplo: 36 = 1 USD equivale a 36 Bs</small>
                         </div>
-                    </div>
                     </div>
                 </div>
             </div>
             
-            <div class="card mb-3">
+            <div class="card mb-3 shadow-sm">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
                         <i class="fas fa-envelope"></i> Configuración de Correo Electrónico
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Configura la cuenta desde la que se enviarán las alertas y los informes, y a qué correo llegarán como destinatario.</p>
+                    <p class="text-muted small">Configura la cuenta desde la que se enviarán las alertas e informes.</p>
                     
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Correo Remitente (Ej: sistema@gmail.com)</label>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold">Correo Remitente</label>
                             <input type="email" class="form-control" name="mail_username" 
                                    value="{{ mail_username }}" placeholder="tucorreo@gmail.com">
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Clave de Aplicación (16 letras)</label>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold">Clave de Aplicación (16 letras)</label>
                             <input type="password" class="form-control" name="mail_password" 
                                    placeholder="{% if has_mail_password %}******** (Dejar vacío para mantener){% else %}Ingresa clave de app de Google{% endif %}">
-                            <small class="text-muted"><a href="https://support.google.com/accounts/answer/185833" target="_blank">¿Cómo generar una clave en Gmail?</a></small>
+                            <small class="text-muted"><a href="https://support.google.com/accounts/answer/185833" target="_blank">¿Cómo generar clave?</a></small>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Correo Destinatario (A donde llegan informes)</label>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-bold">Correo Destinatario</label>
                             <input type="email" class="form-control" name="mail_default_sender" 
                                    value="{{ mail_default_sender }}" placeholder="jefe@empresa.com">
                         </div>
@@ -196,13 +195,19 @@
                 </div>
             </div>
             
-            <div class="mt-4">
-                <button type="submit" class="btn btn-success btn-lg">
-                    <i class="fas fa-save"></i> Guardar Configuración
-                </button>
-                <a href="{{ url_for('producto.listar') }}" class="btn btn-secondary btn-lg ms-2">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+            <div class="mt-4 mb-5">
+                <div class="row g-2">
+                    <div class="col-12 col-sm-auto">
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-save"></i> Guardar Configuración
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-auto">
+                        <a href="{{ url_for('producto.listar') }}" class="btn btn-secondary btn-lg w-100">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
