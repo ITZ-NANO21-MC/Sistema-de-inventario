@@ -65,8 +65,18 @@ function createWindow() {
     }
   });
 
-  // Usar 127.0.0.1 en lugar de localhost para evitar demoras de resolución IPv6
+  // Carga inicial
   mainWindow.loadURL('http://127.0.0.1:5000');
+
+  // Si la carga falla (p.ej. Flask aún no acepta peticiones), reintentar automáticamente
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    if (errorDescription === 'ERR_CONNECTION_REFUSED' || errorCode === -102) {
+      console.log('[App] Esperando a que el backend esté listo... (Reintentando carga)');
+      setTimeout(() => {
+        if (mainWindow) mainWindow.loadURL('http://127.0.0.1:5000');
+      }, 1000); // Reintentar cada segundo
+    }
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
