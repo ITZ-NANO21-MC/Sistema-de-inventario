@@ -8,42 +8,71 @@
         </h2>
         
         {% if tunnel_status.activo %}
-        <div class="card mb-4 border-success">
-            <div class="card-header bg-success text-white">
+        <div class="card mb-4 border-success shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
-                    <i class="fas fa-globe"></i> Túnel Activo
+                    <i class="fas fa-globe"></i> Exposición al Internet: <span class="badge bg-light text-success ms-2">ACTIVO</span>
                 </h5>
+                <i class="fas fa-check-circle fa-lg"></i>
             </div>
             <div class="card-body">
-                <p class="mb-2">Tu aplicación está expuesta al internet a través de:</p>
-                <div class="alert alert-success d-flex align-items-center" role="alert">
-                    <i class="fas fa-link me-2"></i>
-                    <a href="{{ tunnel_status.url }}" target="_blank" class="fw-bold text-break">{{ tunnel_status.url }}</a>
+                <p class="text-muted small mb-3">Tu aplicación está accesible desde cualquier lugar del mundo a través de esta URL segura:</p>
+                
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control fw-bold bg-light" id="tunnel-url-text" value="{{ tunnel_status.url }}" readonly>
+                    <button class="btn btn-success" type="button" onclick="copyTunnelUrl()" id="btn-copy">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                    <a href="{{ tunnel_status.url }}" target="_blank" class="btn btn-outline-success">
+                        <i class="fas fa-external-link-alt"></i> Abrir
+                    </a>
                 </div>
-                <small class="text-muted">
-                    <i class="fas fa-info-circle"></i>
-                    Tipo: {{ tunnel_status.tipo | capitalize }} |
-                    Comparte esta URL con personas autorizadas. La URL cambiará si reinicias el túnel.
-                </small>
+
+                <div class="d-flex align-items-center text-muted">
+                    <span class="badge bg-info me-2">Proxy: {{ tunnel_status.tipo | capitalize }}</span>
+                    <span class="small"><i class="fas fa-shield-alt"></i> Encriptación SSL/TLS activa</span>
+                </div>
             </div>
         </div>
+
+        <script>
+        function copyTunnelUrl() {
+            const copyText = document.getElementById("tunnel-url-text");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // Para móviles
+            navigator.clipboard.writeText(copyText.value);
+            
+            const btn = document.getElementById("btn-copy");
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+            btn.classList.replace('btn-success', 'btn-dark');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.replace('btn-dark', 'btn-success');
+            }, 2000);
+        }
+        </script>
         {% else %}
-        <div class="card mb-4 border-secondary">
+        <div class="card mb-4 border-secondary shadow-sm opacity-75">
             <div class="card-header bg-secondary text-white">
                 <h5 class="mb-0">
                     <i class="fas fa-globe"></i> Exposición al Internet
                 </h5>
             </div>
             <div class="card-body">
-                <p class="mb-2">Tu aplicación solo es accesible localmente. Para exponerla al internet:</p>
-                <div class="alert alert-light border" role="alert">
-                    <code>python Scripts/tunnel.py</code>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="text-warning me-3">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                    <div>
+                        <strong>Modo Local:</strong> Tu aplicación solo es accesible desde esta computadora.
+                    </div>
                 </div>
-                <small class="text-muted">
-                    <i class="fas fa-info-circle"></i>
-                    Requiere <code>cloudflared</code> o <code>zrok</code> instalado.
-                    <a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/" target="_blank">Descargar cloudflared</a>
-                </small>
+                <p class="mb-2 text-muted small">Al usar la aplicación de escritorio (Electron), el túnel debería iniciarse automáticamente si el binario de Cloudflare está presente.</p>
+                <div class="alert alert-light border py-1 mb-0" role="alert">
+                    <small>Estado: <span class="text-danger">Desconectado</span></small>
+                </div>
             </div>
         </div>
         {% endif %}

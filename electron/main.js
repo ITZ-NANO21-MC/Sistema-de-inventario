@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, session } = require('electron');
+const { app, BrowserWindow, ipcMain, session, net } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -7,6 +7,33 @@ let mainWindow;
 let flaskProcess;
 let tunnelProcess;
 let tunnelUrl = null;
+
+/**
+ * Registra la URL del túnel con el backend Flask para que sea visible en la UI.
+ */
+function registerTunnelWithFlask(url) {
+  const request = net.request({
+    method: 'POST',
+    protocol: 'http:',
+    hostname: '127.0.0.1',
+    port: 5000,
+    path: '/api/tunnel/register'
+  });
+
+  request.on('response', (response) => {
+    console.log(`[Tunnel] Registro en backend exitoso (Status: ${response.statusCode})`);
+  });
+
+  request.on('error', (error) => {
+    console.warn(`[Tunnel] Error al registrar en backend: ${error.message}. Reintentando...`);
+    // Reintentar en 5 segundos (útil si Flask tarda más en estar listo para peticiones)
+    setTimeout(() => registerTunnelWithFlask(url), 5000);
+  });
+
+  request.setHeader('Content-Type', 'application/json');
+  request.write(JSON.stringify({ url: url, tipo: 'cloudflared' }));
+  request.end();
+}
 
 function getBinaryPath(binaryName) {
   const isDev = !app.isPackaged;
@@ -116,6 +143,9 @@ function startTunnel() {
       if (urlMatch) {
         tunnelUrl = urlMatch[0];
         console.log(`[Tunnel] URL pública generada: ${tunnelUrl}`);
+        
+        // Notificar al backend Flask para que aparezca en el panel de configuración
+        registerTunnelWithFlask(tunnelUrl);
         
         if (mainWindow) {
           mainWindow.webContents.send('tunnel-url', tunnelUrl);

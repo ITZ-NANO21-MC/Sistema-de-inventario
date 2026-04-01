@@ -18,7 +18,6 @@ def api_status():
 
 
 @tunnel_bp.route('/api/tunnel/register', methods=['POST'])
-@login_required
 def api_register():
     """API: Registra manualmente una URL de túnel."""
     data = request.get_json()
