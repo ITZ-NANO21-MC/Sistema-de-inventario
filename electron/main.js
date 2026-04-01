@@ -38,7 +38,8 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadURL('http://localhost:5000');
+  // Usar 127.0.0.1 en lugar de localhost para evitar demoras de resolución IPv6
+  mainWindow.loadURL('http://127.0.0.1:5000');
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -53,8 +54,8 @@ function startFlask() {
       : path.join(projectRoot, 'venv', 'bin', 'python');
 
     if (!fs.existsSync(pythonPath)) {
-      console.error(`Python no encontrado en: ${pythonPath}`);
-      reject(new Error('Python no encontrado'));
+      console.error(`[App] Python no encontrado en: ${pythonPath}`);
+      reject(new Error(`Entorno virtual no encontrado en ${pythonPath}. Ejecuta prepare_backend primero.`));
       return;
     }
 
@@ -78,14 +79,15 @@ function startFlask() {
       reject(err);
     });
 
+    // Aumentar tiempo de espera para que Flask inicie correctamente
     setTimeout(() => {
       if (flaskProcess && !flaskProcess.killed) {
-        console.log('[Flask] Servidor iniciado en http://localhost:5000');
+        console.log('[Flask] Servidor iniciado en http://127.0.0.1:5000');
         resolve();
       } else {
-        reject(new Error('Flask no inició correctamente'));
+        reject(new Error('El proceso de Flask se cerró inesperadamente.'));
       }
-    }, 3000);
+    }, 6000); // 6 segundos de gracia
   });
 }
 
@@ -102,18 +104,18 @@ function startTunnel() {
       return;
     }
 
-    tunnelProcess = spawn(binaryPath, ['tunnel', '--url', 'http://localhost:5000'], {
+    // Iniciar túnel apuntando a 127.0.0.1:5000
+    tunnelProcess = spawn(binaryPath, ['tunnel', '--url', 'http://127.0.0.1:5000'], {
       stdio: ['ignore', 'pipe', 'pipe']
     });
 
     tunnelProcess.stderr.on('data', (data) => {
       const output = data.toString();
-      console.log(`[Cloudflare] ${output.trim()}`);
       
       const urlMatch = output.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/);
       if (urlMatch) {
         tunnelUrl = urlMatch[0];
-        console.log(`[Tunnel] URL pública: ${tunnelUrl}`);
+        console.log(`[Tunnel] URL pública generada: ${tunnelUrl}`);
         
         if (mainWindow) {
           mainWindow.webContents.send('tunnel-url', tunnelUrl);
@@ -122,35 +124,33 @@ function startTunnel() {
       }
     });
 
-    tunnelProcess.stdout.on('data', (data) => {
-      console.log(`[Cloudflare stdout] ${data.toString().trim()}`);
-    });
-
     tunnelProcess.on('error', (err) => {
-      console.error(`[Tunnel] Error: ${err.message}`);
-      reject(err);
+      console.error(`[Tunnel] Error al iniciar binario: ${err.message}`);
+      resolve(null); // No bloquear la app si falla el túnel
     });
 
+    // Timeout para el túnel (Cloudflare puede tardar en responder)
     setTimeout(() => {
       if (!tunnelUrl) {
-        console.log('[Tunnel] No se pudo obtener URL. La app funciona localmente.');
+        console.warn('[Tunnel] Tiempo de espera agotado. Modo local únicamente.');
         resolve(null);
       }
-    }, 15000);
+    }, 20000); // 20 segundos para el túnel
   });
 }
 
 async function startApp() {
   try {
-    console.log('[App] Iniciando Flask...');
+    console.log('[App] Iniciando backend Flask...');
     await startFlask();
     
-    console.log('[App] Iniciando túnel...');
+    console.log('[App] Iniciando túnel de acceso remoto...');
     await startTunnel();
     
     createWindow();
   } catch (error) {
-    console.error(`[App] Error al iniciar: ${error.message}`);
+    console.error(`[App] Error crítico en inicio: ${error.message}`);
+    // Intentar abrir la ventana de todos modos para mostrar errores si los hay
     createWindow();
   }
 }

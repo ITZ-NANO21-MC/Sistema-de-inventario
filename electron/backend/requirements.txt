@@ -1,13 +1,12 @@
 flask
 flask-sqlalchemy
 flask-migrate
-flask-email
-flask_apscheduler
+Flask-Mail
+Flask-APScheduler
 flask_wtf
 wtforms
 email-validator
-dotenv
+python-dotenv
 pytest
 flask-login
 flask-talisman
-
