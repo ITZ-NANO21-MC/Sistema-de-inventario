@@ -1,0 +1,79 @@
+name: Build Windows Installer
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 3. Install Flask dependencies
+      - name: Install Flask dependencies
+        working-directory: electron/backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Install test dependencies
+      - name: Install test dependencies
+        run: |
+          pip install pytest pytest-cov
+
+      # 5. Run tests
+      - name: Run pytest
+        working-directory: electron/backend
+        run: |
+          pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
+
+      # 6. Install PyInstaller
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      # 7. Build backend with PyInstaller
+      - name: Build backend executable
+        working-directory: electron
+        run: |
+          pyinstaller build.spec --noconfirm
+
+      # 8. Download cloudflared for Windows
+      - name: Download cloudflared
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe" -OutFile "electron/resources/binaries/cloudflared.exe"
+
+      # 9. Copy PyInstaller output to electron resources
+      - name: Copy backend to resources
+        run: |
+          New-Item -ItemType Directory -Force -Path "electron/resources/backend"
+          Copy-Item -Recurse -Force "electron/dist/inventario_backend/*" "electron/resources/backend/"
+
+      # 10. Install Node dependencies
+      - name: Install Electron dependencies
+        working-directory: electron
+        run: npm install
+
+      # 11. Build Windows installer
+      - name: Build NSIS installer
+        working-directory: electron
+        run: npm run build:win
+
+      # 12. Create GitHub Release
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: electron/dist/*.exe
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

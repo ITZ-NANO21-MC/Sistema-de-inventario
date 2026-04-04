@@ -5,9 +5,10 @@ __pycache__/
 *.so
 *.egg
 *.egg-info/
+
+# PyInstaller output (not the config spec)
 dist/
 build/
-*.spec
 
 # Entornos virtuales
 venv/
