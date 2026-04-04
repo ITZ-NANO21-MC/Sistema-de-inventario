@@ -41,7 +41,7 @@ datas = [
 ]
 
 # Instance folder for SQLite database
-datas.append(('instance', 'instance'))
+datas.append(('instance', 'instance'), ('.env', '.'))
 
 a = Analysis(
     ['run.py'],
