@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/*.log
+logs/*.log.*
+
+# Instancia (base de datos SQLite)
+instance/
+*.db
+
+# Variables de entorno
+.env
+!.env-example
+
+# Cobertura
+.coverage
+htmlcov/
+.coverage.*
+
+# Pytest
+.pytest_cache/
+
+# Electron
+electron/node_modules/
+electron/dist/
+electron/backend/
+electron/resources/binaries/
+
+# Documentos generados
+Docs/*.docx
+Docs/*.pdf
+
+# Temp
+tmp/
+temp/
+*.tmp

@@ -26,7 +26,6 @@ function registerTunnelWithFlask(url) {
 
   request.on('error', (error) => {
     console.warn(`[Tunnel] Error al registrar en backend: ${error.message}. Reintentando...`);
-    // Reintentar en 5 segundos (útil si Flask tarda más en estar listo para peticiones)
     setTimeout(() => registerTunnelWithFlask(url), 5000);
   });
 
@@ -51,6 +50,25 @@ function getProjectRoot() {
   return path.join(process.resourcesPath, 'backend');
 }
 
+/**
+ * Devuelve la ruta al ejecutable del backend generado con PyInstaller
+ * (solo en modo producción).
+ */
+function getBackendExecutable() {
+  const isDev = !app.isPackaged;
+  if (isDev) return null;
+  const platform = process.platform;
+  const backendDir = path.join(process.resourcesPath, 'backend', 'dist', 'inventario_backend');
+  if (platform === 'win32') {
+    return path.join(backendDir, 'inventario_backend.exe');
+  } else if (platform === 'linux') {
+    return path.join(backendDir, 'inventario_backend');
+  } else if (platform === 'darwin') {
+    return path.join(backendDir, 'inventario_backend');
+  }
+  return null;
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -65,16 +83,14 @@ function createWindow() {
     }
   });
 
-  // Carga inicial
   mainWindow.loadURL('http://127.0.0.1:5000');
 
-  // Si la carga falla (p.ej. Flask aún no acepta peticiones), reintentar automáticamente
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
     if (errorDescription === 'ERR_CONNECTION_REFUSED' || errorCode === -102) {
       console.log('[App] Esperando a que el backend esté listo... (Reintentando carga)');
       setTimeout(() => {
         if (mainWindow) mainWindow.loadURL('http://127.0.0.1:5000');
-      }, 1000); // Reintentar cada segundo
+      }, 1000);
     }
   });
 
@@ -85,30 +101,47 @@ function createWindow() {
 
 function startFlask() {
   return new Promise((resolve, reject) => {
-    const projectRoot = getProjectRoot();
-    const pythonPath = process.platform === 'win32' 
-      ? path.join(projectRoot, 'venv', 'Scripts', 'python.exe')
-      : path.join(projectRoot, 'venv', 'bin', 'python');
+    const isDev = !app.isPackaged;
+    const backendExecutable = getBackendExecutable();
 
-    if (!fs.existsSync(pythonPath)) {
-      console.error(`[App] Python no encontrado en: ${pythonPath}`);
-      reject(new Error(`Entorno virtual no encontrado en ${pythonPath}. Ejecuta prepare_backend primero.`));
-      return;
+    if (isDev || !backendExecutable || !fs.existsSync(backendExecutable)) {
+      // --- MODO DESARROLLO: usar Python con entorno virtual ---
+      console.log('[App] Modo desarrollo. Usando Python...');
+      const projectRoot = getProjectRoot();
+      let pythonPath;
+      if (process.platform === 'win32') {
+        pythonPath = path.join(projectRoot, 'venv', 'Scripts', 'python.exe');
+      } else {
+        pythonPath = path.join(projectRoot, 'venv', 'bin', 'python');
+      }
+      if (!fs.existsSync(pythonPath)) {
+        reject(new Error(`Python no encontrado en ${pythonPath}`));
+        return;
+      }
+      flaskProcess = spawn(pythonPath, ['run.py'], {
+        cwd: projectRoot,
+        env: { ...process.env, FLASK_DEBUG: 'False' },
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+    } else {
+      // --- MODO PRODUCCIÓN: usar el ejecutable de PyInstaller ---
+      console.log(`[App] Iniciando backend empaquetado: ${backendExecutable}`);
+      const backendDir = path.dirname(backendExecutable);
+
+      // Sin variables de entorno personalizadas; solo el entorno del sistema
+      flaskProcess = spawn(backendExecutable, [], {
+        cwd: backendDir,
+        env: { ...process.env, FLASK_DEBUG: 'False' },
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
     }
-
-    flaskProcess = spawn(pythonPath, ['run.py'], {
-      cwd: projectRoot,
-      env: { ...process.env, FLASK_DEBUG: 'False' },
-      stdio: ['ignore', 'pipe', 'pipe']
-    });
 
     flaskProcess.stdout.on('data', (data) => {
       console.log(`[Flask] ${data.toString().trim()}`);
     });
 
     flaskProcess.stderr.on('data', (data) => {
-      const output = data.toString();
-      console.error(`[Flask Error] ${output.trim()}`);
+      console.error(`[Flask Error] ${data.toString().trim()}`);
     });
 
     flaskProcess.on('error', (err) => {
@@ -116,7 +149,6 @@ function startFlask() {
       reject(err);
     });
 
-    // Aumentar tiempo de espera para que Flask inicie correctamente
     setTimeout(() => {
       if (flaskProcess && !flaskProcess.killed) {
         console.log('[Flask] Servidor iniciado en http://127.0.0.1:5000');
@@ -124,7 +156,7 @@ function startFlask() {
       } else {
         reject(new Error('El proceso de Flask se cerró inesperadamente.'));
       }
-    }, 6000); // 6 segundos de gracia
+    }, 6000);
   });
 }
 
@@ -141,22 +173,17 @@ function startTunnel() {
       return;
     }
 
-    // Iniciar túnel apuntando a 127.0.0.1:5000
     tunnelProcess = spawn(binaryPath, ['tunnel', '--url', 'http://127.0.0.1:5000'], {
       stdio: ['ignore', 'pipe', 'pipe']
     });
 
     tunnelProcess.stderr.on('data', (data) => {
       const output = data.toString();
-      
       const urlMatch = output.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/);
       if (urlMatch) {
         tunnelUrl = urlMatch[0];
         console.log(`[Tunnel] URL pública generada: ${tunnelUrl}`);
-        
-        // Notificar al backend Flask para que aparezca en el panel de configuración
         registerTunnelWithFlask(tunnelUrl);
-        
         if (mainWindow) {
           mainWindow.webContents.send('tunnel-url', tunnelUrl);
         }
@@ -166,16 +193,15 @@ function startTunnel() {
 
     tunnelProcess.on('error', (err) => {
       console.error(`[Tunnel] Error al iniciar binario: ${err.message}`);
-      resolve(null); // No bloquear la app si falla el túnel
+      resolve(null);
     });
 
-    // Timeout para el túnel (Cloudflare puede tardar en responder)
     setTimeout(() => {
       if (!tunnelUrl) {
         console.warn('[Tunnel] Tiempo de espera agotado. Modo local únicamente.');
         resolve(null);
       }
-    }, 20000); // 20 segundos para el túnel
+    }, 20000);
   });
 }
 
@@ -183,21 +209,17 @@ async function startApp() {
   try {
     console.log('[App] Iniciando backend Flask...');
     await startFlask();
-    
     console.log('[App] Iniciando túnel de acceso remoto...');
     await startTunnel();
-    
     createWindow();
   } catch (error) {
     console.error(`[App] Error crítico en inicio: ${error.message}`);
-    // Intentar abrir la ventana de todos modos para mostrar errores si los hay
     createWindow();
   }
 }
 
 app.whenReady().then(() => {
   startApp();
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -218,12 +240,10 @@ app.on('before-quit', () => {
 
 function cleanup() {
   console.log('[App] Limpiando procesos...');
-  
   if (tunnelProcess && !tunnelProcess.killed) {
     tunnelProcess.kill();
     console.log('[Tunnel] Túnel cerrado.');
   }
-  
   if (flaskProcess && !flaskProcess.killed) {
     flaskProcess.kill();
     console.log('[Flask] Servidor Flask cerrado.');
