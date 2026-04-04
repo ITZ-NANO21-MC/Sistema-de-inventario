@@ -1,0 +1,108 @@
+# AGENTS.md - Sistema de Inventario
+
+Desktop inventory management app: Electron shell + Flask backend (SQLAlchemy/SQLite) + Jinja2 templates. Manages products, phone models, compatibility, auth, email alerts, and Excel export.
+
+## Directory Structure
+```
+inventario_app/
+└── electron/
+    ├── main.js              # Electron main process
+    ├── preload.js           # Context bridge (IPC)
+    ├── package.json         # Electron deps & build config
+    ├── resources/           # Icons, cloudflared binary
+    └── backend/             # Flask application
+        ├── app/
+        │   ├── __init__.py  # App factory (create_app)
+        │   ├── models.py    # SQLAlchemy models
+        │   ├── forms.py     # WTForms definitions
+        │   ├── controllers/ # Business logic (thin)
+        │   ├── services/    # Email, audit, tunnel
+        │   ├── views/       # Flask blueprints (routes)
+        │   ├── templates/   # Jinja2 HTML
+        │   └── static/      # CSS, JS, images
+        ├── tests/           # Pytest suite
+        ├── config.py        # Configuration
+        ├── run.py           # Entry point
+        └── requirements.txt
+```
+
+## Commands
+
+### Electron (from `electron/`)
+```bash
+npm start                    # Run Electron app
+npm run dev                  # Dev mode
+npm run build:win            # Build Windows (NSIS + portable)
+npm run build:linux          # Build Linux (AppImage)
+npm run build:mac            # Build macOS
+```
+
+### Flask Backend (from `electron/backend/`)
+```bash
+python -m venv venv && source venv/bin/activate   # Setup
+pip install -r requirements.txt                    # Install deps
+python run.py                                      # Dev server
+flask db migrate -m "msg"                          # Create migration
+flask db upgrade                                   # Apply migration
+flask db downgrade                                 # Rollback
+```
+
+### Test (from `electron/backend/`)
+```bash
+pytest                                    # All tests
+pytest tests/test_file.py                 # Single file
+pytest tests/test_file.py::TestClass::test_method  # Single test
+pytest -v                                 # Verbose
+pytest --cov=app --cov-report=term-missing  # Coverage
+```
+Tests use `conftest.py` fixtures (`app`, `db`, `client`, `auth_client`) and `factories.py` helpers (`create_producto()`, `create_modelo()`, `create_usuario()`). Class-based organization: `class TestCrear:`, methods `test_crear_con_modelos`.
+
+### Lint & Format (from `electron/backend/`)
+```bash
+black app/                                # Format
+isort app/                                # Sort imports
+flake8 app/                               # Lint
+black --check app/ && isort --check-only app/ && flake8 app/  # Check all
+```
+
+## Code Style
+
+### Python
+- **Imports**: stdlib → third-party → local (alphabetical within groups, blank line between)
+- **Formatting**: Black (88 chars), trailing commas in multi-line
+- **Type hints**: All params/returns. Use `Optional[T]`, `List[T]`, `Dict[K, V]`
+- **Naming**: Classes `PascalCase`, functions/vars `snake_case`, constants `UPPER_SNAKE_CASE`, private `_leading_underscore`
+- **Docstrings**: Triple double quotes, Google style
+- **Error handling**: Catch specific exceptions, `db.session.rollback()` on DB errors, log via `current_app.logger`, re-raise after logging
+- **Spanish identifiers** are standard throughout the codebase
+
+### JavaScript (Electron)
+- **Modules**: CommonJS `require()`, no ES modules
+- **Indentation**: 2 spaces
+- **Quotes**: Single quotes
+- **Naming**: `camelCase` for functions/vars, `PascalCase` for constructors
+- **Security**: `contextIsolation: true`, `nodeIntegration: false` always
+- **Error handling**: Promise rejections logged with `[Tag]` prefix (e.g., `[Flask]`, `[Tunnel]`, `[App]`)
+- **Process management**: Always clean up child processes in `cleanup()`
+
+### Flask Patterns
+- Application factory pattern via `create_app()`
+- Access app config via `current_app` (never import app directly)
+- Use `url_for()` for URLs, `flash()` for user feedback
+- Blueprints with `*_bp` naming (e.g., `producto_bp`)
+- Thin controllers; move complex logic to services
+
+### SQLAlchemy
+- Use `joinedload`/`selectinload` to avoid N+1 queries
+- Explicit `db.session.commit()`/`db.session.rollback()`
+- Models focused on data representation only
+
+### Testing
+- Mock external dependencies (email, tunnel)
+- Test both success and failure paths
+- Use `db` fixture for database lifecycle
+
+### Git
+- Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+- Feature branches, descriptive messages
+- Never commit secrets, `.env`, or `backend/AGENTS.md`
