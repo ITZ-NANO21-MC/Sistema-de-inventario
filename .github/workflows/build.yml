@@ -9,6 +9,10 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DATABASE_URL: sqlite:///inventario.db
+
     steps:
       # 1. Checkout
       - name: Checkout code
