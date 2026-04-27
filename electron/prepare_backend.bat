@@ -30,6 +30,25 @@ if not exist "%BACKEND_DIR%\venv" (
 
 echo.
 echo Backend listo en: %BACKEND_DIR%
+
+REM --- Crear estructura de datos persistentes junto al ejecutable ---
+REM Este directorio data/ es donde el backend busca .env, instance/ y logs/
+set DIST_BACKEND_DIR=%BACKEND_DIR%\dist\inventario_backend
+if exist "%DIST_BACKEND_DIR%" (
+    set DATA_DIR=%DIST_BACKEND_DIR%\data
+    echo Creando estructura de datos persistentes en: %DIST_BACKEND_DIR%\data
+    if not exist "%DIST_BACKEND_DIR%\data\instance" mkdir "%DIST_BACKEND_DIR%\data\instance"
+    if not exist "%DIST_BACKEND_DIR%\data\logs" mkdir "%DIST_BACKEND_DIR%\data\logs"
+
+    if exist "%BACKEND_DIR%\.env" (
+        copy /Y "%BACKEND_DIR%\.env" "%DIST_BACKEND_DIR%\data\.env" >nul
+        echo .env copiado a la carpeta de datos.
+    ) else (
+        echo ADVERTENCIA: No se encontro .env en %BACKEND_DIR%. Deberas crearlo manualmente.
+    )
+) else (
+    echo NOTA: El directorio dist/ aun no existe. Ejecuta PyInstaller y vuelve a correr esto.
+)
 echo.
 echo Para iniciar la app Electron:
 echo   cd %SCRIPT_DIR%

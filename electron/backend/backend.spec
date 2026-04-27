@@ -27,10 +27,11 @@ a = Analysis(
         'alembic',
         'tomli',           # necesario para alembic en Python < 3.11
         'pkg_resources',
-        'python-dotenv',
+        'dotenv',          # NOTA: es 'dotenv' en código, no 'python-dotenv'
         'pytest',
         'openpyxl',
-        'email-validator',
+        'email_validator', # NOTA: es con guión bajo en código
+        'flask_mail',      # Agregado ya que se usa en app/services/
     ],
     hookspath=[],
     hooksconfig={},
