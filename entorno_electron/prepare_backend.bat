@@ -15,6 +15,7 @@ xcopy /E /I /Y "%PROJECT_ROOT%\app" "%BACKEND_DIR%\app"
 copy /Y "%PROJECT_ROOT%\run.py" "%BACKEND_DIR%\run.py"
 copy /Y "%PROJECT_ROOT%\config.py" "%BACKEND_DIR%\config.py"
 copy /Y "%PROJECT_ROOT%\requirements.txt" "%BACKEND_DIR%\requirements.txt"
+copy /Y "%PROJECT_ROOT%\backend.spec" "%BACKEND_DIR%\backend.spec"
 
 REM Copiar .env si existe
 if exist "%PROJECT_ROOT%\.env" copy /Y "%PROJECT_ROOT%\.env" "%BACKEND_DIR%\.env"

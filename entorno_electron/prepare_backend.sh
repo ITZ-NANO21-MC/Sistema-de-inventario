@@ -35,6 +35,7 @@ copy_if_exists "$PROJECT_ROOT/app" "$BACKEND_DIR/"
 copy_if_exists "$PROJECT_ROOT/run.py" "$BACKEND_DIR/"
 copy_if_exists "$PROJECT_ROOT/config.py" "$BACKEND_DIR/"
 copy_if_exists "$PROJECT_ROOT/requirements.txt" "$BACKEND_DIR/"
+copy_if_exists "$PROJECT_ROOT/backend.spec" "$BACKEND_DIR/"
 
 # Copiar .env si existe
 if [ -f "$PROJECT_ROOT/.env" ]; then
