@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain, session, net } = require('electron');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -121,7 +121,8 @@ function startFlask() {
       flaskProcess = spawn(pythonPath, ['run.py'], {
         cwd: projectRoot,
         env: { ...process.env, FLASK_DEBUG: 'False' },
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        detached: true
       });
     } else {
       // --- MODO PRODUCCIÓN: usar el ejecutable de PyInstaller ---
@@ -132,7 +133,8 @@ function startFlask() {
       flaskProcess = spawn(backendExecutable, [], {
         cwd: backendDir,
         env: { ...process.env, FLASK_DEBUG: 'False' },
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        detached: true
       });
     }
 
@@ -174,7 +176,8 @@ function startTunnel() {
     }
 
     tunnelProcess = spawn(binaryPath, ['tunnel', '--url', 'http://127.0.0.1:5000'], {
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: true
     });
 
     tunnelProcess.stderr.on('data', (data) => {
@@ -238,15 +241,44 @@ app.on('before-quit', () => {
   cleanup();
 });
 
+/**
+ * Mata un proceso y todo su árbol de procesos hijos.
+ * Necesario porque PyInstaller en modo one-file crea un proceso hijo
+ * que no recibe señales enviadas solo al padre.
+ */
+function killProcessTree(proc, label) {
+  if (!proc || !proc.pid) return;
+
+  try {
+    if (process.platform === 'win32') {
+      // Windows: taskkill /T mata todo el árbol de procesos
+      execSync(`taskkill /pid ${proc.pid} /T /F`, { stdio: 'ignore' });
+    } else {
+      // Linux/macOS: matar el grupo de procesos completo (PID negativo = PGID)
+      process.kill(-proc.pid, 'SIGKILL');
+    }
+    console.log(`[${label}] Árbol de procesos eliminado (PID: ${proc.pid}).`);
+  } catch (err) {
+    // El proceso puede ya no existir (ESRCH) — eso está bien
+    if (err.code !== 'ESRCH') {
+      console.warn(`[${label}] Error matando árbol de procesos: ${err.message}`);
+    }
+    // Fallback: intentar kill directo
+    try {
+      proc.kill('SIGKILL');
+    } catch (e) {
+      // El proceso ya no existe
+    }
+  }
+}
+
 function cleanup() {
   console.log('[App] Limpiando procesos...');
   if (tunnelProcess && !tunnelProcess.killed) {
-    tunnelProcess.kill();
-    console.log('[Tunnel] Túnel cerrado.');
+    killProcessTree(tunnelProcess, 'Tunnel');
   }
   if (flaskProcess && !flaskProcess.killed) {
-    flaskProcess.kill();
-    console.log('[Flask] Servidor Flask cerrado.');
+    killProcessTree(flaskProcess, 'Flask');
   }
 }
 
