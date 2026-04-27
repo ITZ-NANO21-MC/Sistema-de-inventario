@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Preparar el directorio backend para Electron
-# Copia la aplicación Flask al directorio electron/backend e instala dependencias
+# Copia la aplicación Flask al directorio entorno_electron/backend e instala dependencias
 
 set -e
 

@@ -5,7 +5,7 @@ Desktop inventory management app: Electron shell + Flask backend (SQLAlchemy/SQL
 ## Directory Structure
 ```
 inventario_app/
-└── electron/
+└── entorno_electron/
     ├── main.js              # Electron main process
     ├── preload.js           # Context bridge (IPC)
     ├── package.json         # Electron deps & build config
@@ -28,7 +28,7 @@ inventario_app/
 
 ## Commands
 
-### Electron (from `electron/`)
+### Electron (from `entorno_electron/`)
 ```bash
 npm start                    # Run Electron app
 npm run dev                  # Dev mode
@@ -37,7 +37,7 @@ npm run build:linux          # Build Linux (AppImage)
 npm run build:mac            # Build macOS
 ```
 
-### Flask Backend (from `electron/backend/`)
+### Flask Backend (from `entorno_electron/backend/`)
 ```bash
 python -m venv venv && source venv/bin/activate   # Setup
 pip install -r requirements.txt                    # Install deps
@@ -47,7 +47,7 @@ flask db upgrade                                   # Apply migration
 flask db downgrade                                 # Rollback
 ```
 
-### Test (from `electron/backend/`)
+### Test (from `entorno_electron/backend/`)
 ```bash
 pytest                                    # All tests
 pytest tests/test_file.py                 # Single file
@@ -57,7 +57,7 @@ pytest --cov=app --cov-report=term-missing  # Coverage
 ```
 Tests use `conftest.py` fixtures (`app`, `db`, `client`, `auth_client`) and `factories.py` helpers (`create_producto()`, `create_modelo()`, `create_usuario()`). Class-based organization: `class TestCrear:`, methods `test_crear_con_modelos`.
 
-### Lint & Format (from `electron/backend/`)
+### Lint & Format (from `entorno_electron/backend/`)
 ```bash
 black app/                                # Format
 isort app/                                # Sort imports

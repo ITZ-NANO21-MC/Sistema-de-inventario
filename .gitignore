@@ -48,10 +48,10 @@ htmlcov/
 .pytest_cache/
 
 # Electron
-electron/node_modules/
-electron/dist/
-electron/backend/
-electron/resources/binaries/
+entorno_electron/node_modules/
+entorno_electron/dist/
+entorno_electron/backend/
+entorno_electron/resources/binaries/
 
 # Documentos generados
 Docs/*.docx

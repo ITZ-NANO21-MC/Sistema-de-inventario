@@ -1,5 +1,5 @@
 @echo off
-REM Preparar el directorio backend para Electron en Windows
+REM Preparar el directorio backend para entorno_electron en Windows
 
 set SCRIPT_DIR=%~dp0
 set PROJECT_ROOT=%SCRIPT_DIR%..
