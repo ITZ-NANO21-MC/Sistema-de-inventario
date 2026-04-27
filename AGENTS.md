@@ -5,25 +5,28 @@ Desktop inventory management app: Electron shell + Flask backend (SQLAlchemy/SQL
 ## Directory Structure
 ```
 inventario_app/
+├── app/                     # Flask application
+│   ├── __init__.py  # App factory (create_app)
+│   ├── models.py    # SQLAlchemy models
+│   ├── forms.py     # WTForms definitions
+│   ├── controllers/ # Business logic (thin)
+│   ├── services/    # Email, audit, tunnel
+│   ├── views/       # Flask blueprints (routes)
+│   ├── templates/   # Jinja2 HTML
+│   └── static/      # CSS, JS, images
+├── tests/           # Pytest suite
+├── Scripts/         # Utility scripts
+├── config.py        # Configuration
+├── run.py           # Entry point
+├── backend.spec     # PyInstaller spec
+├── requirements.txt # Python dependencies
 └── entorno_electron/
+    ├── prepare_backend.sh   # Build script for Linux
+    ├── prepare_backend.bat  # Build script for Windows
     ├── main.js              # Electron main process
     ├── preload.js           # Context bridge (IPC)
     ├── package.json         # Electron deps & build config
-    ├── resources/           # Icons, cloudflared binary
-    └── backend/             # Flask application
-        ├── app/
-        │   ├── __init__.py  # App factory (create_app)
-        │   ├── models.py    # SQLAlchemy models
-        │   ├── forms.py     # WTForms definitions
-        │   ├── controllers/ # Business logic (thin)
-        │   ├── services/    # Email, audit, tunnel
-        │   ├── views/       # Flask blueprints (routes)
-        │   ├── templates/   # Jinja2 HTML
-        │   └── static/      # CSS, JS, images
-        ├── tests/           # Pytest suite
-        ├── config.py        # Configuration
-        ├── run.py           # Entry point
-        └── requirements.txt
+    └── resources/           # Icons, cloudflared binary
 ```
 
 ## Commands
@@ -37,7 +40,7 @@ npm run build:linux          # Build Linux (AppImage)
 npm run build:mac            # Build macOS
 ```
 
-### Flask Backend (from `entorno_electron/backend/`)
+### Flask Backend (from project root `inventario_app/`)
 ```bash
 python -m venv venv && source venv/bin/activate   # Setup
 pip install -r requirements.txt                    # Install deps
@@ -47,7 +50,7 @@ flask db upgrade                                   # Apply migration
 flask db downgrade                                 # Rollback
 ```
 
-### Test (from `entorno_electron/backend/`)
+### Test (from project root `inventario_app/`)
 ```bash
 pytest                                    # All tests
 pytest tests/test_file.py                 # Single file
@@ -57,7 +60,7 @@ pytest --cov=app --cov-report=term-missing  # Coverage
 ```
 Tests use `conftest.py` fixtures (`app`, `db`, `client`, `auth_client`) and `factories.py` helpers (`create_producto()`, `create_modelo()`, `create_usuario()`). Class-based organization: `class TestCrear:`, methods `test_crear_con_modelos`.
 
-### Lint & Format (from `entorno_electron/backend/`)
+### Lint & Format (from project root `inventario_app/`)
 ```bash
 black app/                                # Format
 isort app/                                # Sort imports
@@ -105,4 +108,4 @@ black --check app/ && isort --check-only app/ && flake8 app/  # Check all
 ### Git
 - Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 - Feature branches, descriptive messages
-- Never commit secrets, `.env`, or `backend/AGENTS.md`
+- Never commit secrets, `.env`, or `AGENTS.md`
