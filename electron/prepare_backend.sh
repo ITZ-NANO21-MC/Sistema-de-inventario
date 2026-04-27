@@ -86,3 +86,24 @@ if [ -d "$PYTHON_WIN_DIR" ]; then
 fi
 
 echo "Backend preparado con éxito en: $BACKEND_DIR"
+
+# --- Crear estructura de datos persistentes junto al ejecutable ---
+# Este directorio data/ es donde el backend busca .env, instance/ y logs/
+# cuando se ejecuta desde el ejecutable empaquetado con PyInstaller.
+DIST_BACKEND_DIR="$BACKEND_DIR/dist/inventario_backend"
+if [ -d "$DIST_BACKEND_DIR" ]; then
+    DATA_DIR="$DIST_BACKEND_DIR/data"
+    echo "Creando estructura de datos persistentes en: $DATA_DIR"
+    mkdir -p "$DATA_DIR/instance"
+    mkdir -p "$DATA_DIR/logs"
+
+    # Copiar .env al directorio de datos si existe
+    if [ -f "$BACKEND_DIR/.env" ]; then
+        cp "$BACKEND_DIR/.env" "$DATA_DIR/"
+        echo ".env copiado a $DATA_DIR/"
+    else
+        echo "ADVERTENCIA: No se encontró .env en $BACKEND_DIR. Deberás crearlo manualmente en $DATA_DIR/"
+    fi
+else
+    echo "NOTA: El directorio dist/ aún no existe. Ejecuta PyInstaller primero y luego vuelve a correr este script."
+fi

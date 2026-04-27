@@ -18,7 +18,11 @@ login_manager.login_message = 'Por favor, inicie sesión para acceder a esta pá
 login_manager.login_message_category = 'warning'
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    from config import get_data_dir
+    instance_path = os.path.join(get_data_dir(), 'instance')
+    os.makedirs(instance_path, exist_ok=True)
+
+    app = Flask(__name__, instance_path=instance_path)
     app.config.from_object(config_class)
 
     db.init_app(app)

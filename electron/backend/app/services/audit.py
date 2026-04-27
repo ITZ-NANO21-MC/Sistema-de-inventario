@@ -13,7 +13,8 @@ audit_logger = logging.getLogger('security_audit')
 
 def configurar_audit_logger(app):
     """Configura el logger de auditoría con rotación de archivos."""
-    log_dir = os.path.join(app.root_path, '..', 'logs')
+    from config import get_data_dir
+    log_dir = os.path.join(get_data_dir(), 'logs')
     os.makedirs(log_dir, exist_ok=True)
     
     log_file = os.path.join(log_dir, 'security.log')
