@@ -50,40 +50,7 @@ if [ ! -d "$BACKEND_DIR/venv" ]; then
     echo "Dependencias locales instaladas."
 fi
 
-# 2. Preparar dependencias para Windows (Portable) - Proceso Cross-platform
-if [ -d "$PYTHON_WIN_DIR" ]; then
-    echo "Instalando dependencias para Windows en python-win/site-packages..."
-    mkdir -p "$PYTHON_WIN_DIR/site-packages"
-    
-    # Usamos el pip del venv recién creado para descargar binarios de Windows
-    source "$BACKEND_DIR/venv/bin/activate"
-    
-    echo "Instalando dependencias para Windows..."
-    
-    # 1. Instalar la mayoría desde binarios oficiales para Windows
-    # Usamos --only-binary=:all: para asegurar que NO intentamos compilar para Linux
-    # Esto descargará e instalará directamente los .whl adecuados (incluyendo pure-python como 'any')
-    python -m pip install \
-        --target "$PYTHON_WIN_DIR/site-packages" \
-        --platform win_amd64 \
-        --only-binary=:all: \
-        --no-compile \
-        -r "$BACKEND_DIR/requirements.txt" || echo "  Algunos paquetes no tienen binarios, se instalarán por separado..."
-    
-    # 2. Instalar individualmente los que sabemos que son problemáticos o solo fuente
-    # Como Flask-APScheduler. Al no usar --platform, pip lo bajará como fuente
-    # Y lo "instalará" (descomprimirá) en el destino. Al ser pure-python, funciona.
-    echo "Instalando paquetes fuente (pure-python)..."
-    python -m pip install \
-        --target "$PYTHON_WIN_DIR/site-packages" \
-        --no-deps \
-        --no-compile \
-        Flask-APScheduler
-    
-    deactivate
-    
-    echo "Dependencias de Windows instaladas con éxito."
-fi
+
 
 echo "Backend preparado con éxito en: $BACKEND_DIR"
 
