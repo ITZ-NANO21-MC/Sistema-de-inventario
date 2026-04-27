@@ -33,12 +33,13 @@ jobs:
       # 4. Prepare Backend (Create structure and install pip dependencies)
       - name: Prepare Backend Environment
         working-directory: entorno_electron
-        run: |
-          cmd.exe /c "prepare_backend.bat"
+        shell: cmd
+        run: prepare_backend.bat
 
       # 5. Build backend with PyInstaller
       - name: Build backend executable
         working-directory: entorno_electron\backend
+        shell: cmd
         run: |
           call venv\Scripts\activate.bat
           pip install pyinstaller
@@ -49,8 +50,8 @@ jobs:
       # But since we just built PyInstaller, we can run prepare_backend.bat again to trigger the post-build block.
       - name: Setup Production Data Directory
         working-directory: entorno_electron
-        run: |
-          cmd.exe /c "prepare_backend.bat"
+        shell: cmd
+        run: prepare_backend.bat
 
       # 7. Download cloudflared for Windows
       - name: Download cloudflared
