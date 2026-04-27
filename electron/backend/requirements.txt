@@ -3,10 +3,15 @@ flask-sqlalchemy
 flask-migrate
 Flask-Mail
 Flask-APScheduler
-flask_wtf
+flask-wtf
 wtforms
 email-validator
 python-dotenv
 pytest
 flask-login
 flask-talisman
+sqlalchemy
+alembic
+tomli
+openpyxl
+werkzeug
