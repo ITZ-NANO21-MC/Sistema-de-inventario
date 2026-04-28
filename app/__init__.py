@@ -48,6 +48,15 @@ def create_app(config_class=Config):
     from app.services.audit import configurar_audit_logger
     configurar_audit_logger(app)
 
+    # Aplicar migraciones automáticamente al inicio
+    with app.app_context():
+        from flask_migrate import upgrade
+        try:
+            upgrade()
+            app.logger.info("Migraciones de base de datos comprobadas/aplicadas correctamente.")
+        except Exception as e:
+            app.logger.error(f"Error al aplicar migraciones automáticas: {e}")
+
     # Configuración de APScheduler
     scheduler.init_app(app)
     
