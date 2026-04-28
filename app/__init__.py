@@ -59,11 +59,18 @@ def create_app(config_class=Config):
 
     # Configuración de APScheduler
     scheduler.init_app(app)
+
+    # Registrar y arrancar jobs del scheduler.
+    # En modo debug, Werkzeug lanza 2 procesos (padre watcher + hijo servidor).
+    # Solo registramos jobs en el hijo (WERKZEUG_RUN_MAIN='true') para evitar
+    # duplicados. En producción (PyInstaller/Electron) no hay reloader, así
+    # que siempre registramos.
+    is_reloader_parent = (
+        os.environ.get('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
+        and os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
+    )
     
-    # Solo registrar y arrancar jobs en el proceso hijo del reloader.
-    # NOTA: app.debug es False aquí porque debug=True se aplica después en app.run().
-    # Por eso solo verificamos WERKZEUG_RUN_MAIN (solo existe en el proceso hijo).
-    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+    if not is_reloader_parent:
         from app.services.alertas import verificar_stock_y_notificar, generar_informe_general
         
         # Alerta de stock bajo - configurable desde .env
@@ -113,6 +120,7 @@ def create_app(config_class=Config):
             )
         
         scheduler.start()
+        app.logger.info("APScheduler iniciado correctamente con los jobs configurados.")
 
     # Registro de blueprints
     from app.views.producto_routes import producto_bp
