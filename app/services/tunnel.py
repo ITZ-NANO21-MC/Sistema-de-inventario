@@ -44,8 +44,19 @@ def get_tunnel_status():
             with open(status_file, 'r') as f:
                 data = json.load(f)
             
-            # Verificar que el estado no sea muy antiguo (5 minutos)
-            if time.time() - data.get('timestamp', 0) < 300:
+            # Verificar que el estado no sea muy antiguo (24 horas).
+            # El ciclo de vida real del túnel lo gestiona Electron;
+            # este timeout es solo una salvaguarda por si el archivo
+            # queda huérfano tras un cierre inesperado.
+            if time.time() - data.get('timestamp', 0) < 86400:
+                # Refrescar el timestamp para mantener el estado vivo
+                # mientras la app siga consultándolo.
+                data['timestamp'] = time.time()
+                try:
+                    with open(status_file, 'w') as f:
+                        json.dump(data, f)
+                except IOError:
+                    pass
                 return data
         except (json.JSONDecodeError, IOError):
             pass
@@ -56,6 +67,7 @@ def get_tunnel_status():
         'tipo': None,
         'timestamp': 0
     }
+
 
 
 def save_tunnel_status(url, tunnel_type='cloudflared'):
