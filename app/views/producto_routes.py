@@ -76,6 +76,7 @@ def crear():
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,
             'stock_minimo': form.stock_minimo.data,
+            'stock_requerido': form.stock_requerido.data or 0,
             'proveedor': form.proveedor.data,
             'precio_mayor_bs': form.precio_mayor_bs.data or 0,
             'precio_mayor_usd': form.precio_mayor_usd.data or 0,
@@ -118,6 +119,7 @@ def editar(id):
             'categoria': form.categoria.data,
             'cantidad_stock': form.cantidad_stock.data,
             'stock_minimo': form.stock_minimo.data,
+            'stock_requerido': form.stock_requerido.data or 0,
             'proveedor': form.proveedor.data,
             'precio_mayor_bs': form.precio_mayor_bs.data or 0,
             'precio_mayor_usd': form.precio_mayor_usd.data or 0,
@@ -210,7 +212,7 @@ def exportar_excel():
     # Encabezados
     headers = [
         'ID', 'Nombre', 'Marca', 'Categoría', 'Descripción',
-        'Stock', 'Stock Mínimo', 'Proveedor',
+        'Stock', 'Stock Mínimo', 'Stock Requerido', 'Proveedor',
         'Precio Mayor (USD)', 'Precio Mayor (Bs)',
         'Precio Detal (USD)', 'Precio Detal (Bs)',
         'Precio Técnico (USD)', 'Precio Técnico (Bs)',
@@ -230,7 +232,7 @@ def exportar_excel():
         
         values = [
             p.id, p.nombre, p.marca or '-', p.categoria, p.descripcion or '-',
-            p.cantidad_stock, p.stock_minimo, p.proveedor or '-',
+            p.cantidad_stock, p.stock_minimo, p.stock_requerido or 0, p.proveedor or '-',
             float(p.precio_mayor_usd or 0), float(p.precio_mayor_bs or 0),
             float(p.precio_detal_usd or 0), float(p.precio_detal_bs or 0),
             float(p.precio_tecnico_usd or 0), float(p.precio_tecnico_bs or 0),
