@@ -84,6 +84,7 @@ class ProductoController:
             categoria=data['categoria'],
             cantidad_stock=data['cantidad_stock'],
             stock_minimo=data['stock_minimo'],
+            stock_requerido=data.get('stock_requerido', 0),
             proveedor=data.get('proveedor', ''),
             precio_mayor_bs=data.get('precio_mayor_bs', 0),
             precio_mayor_usd=data.get('precio_mayor_usd', 0),
@@ -114,6 +115,7 @@ class ProductoController:
         producto.categoria = data['categoria']
         producto.cantidad_stock = data['cantidad_stock']
         producto.stock_minimo = data['stock_minimo']
+        producto.stock_requerido = data.get('stock_requerido', 0)
         producto.proveedor = data.get('proveedor', '')
         producto.precio_mayor_bs = data.get('precio_mayor_bs', 0)
         producto.precio_mayor_usd = data.get('precio_mayor_usd', 0)
