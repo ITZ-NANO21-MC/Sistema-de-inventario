@@ -55,17 +55,24 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             {{ form.cantidad_stock.label(class="form-label") }}
                             {{ form.cantidad_stock(class="form-control" + (" is-invalid" if form.cantidad_stock.errors else ""), type="number", min="0") }}
                             {% for error in form.cantidad_stock.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             {{ form.stock_minimo.label(class="form-label") }}
                             {{ form.stock_minimo(class="form-control" + (" is-invalid" if form.stock_minimo.errors else ""), type="number", min="1") }}
                             {% for error in form.stock_minimo.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.stock_requerido.label(class="form-label") }}
+                            {{ form.stock_requerido(class="form-control" + (" is-invalid" if form.stock_requerido.errors else ""), type="number", min="0") }}
+                            {% for error in form.stock_requerido.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>

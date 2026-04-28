@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <th>Categoría</th>
                 <th>Stock</th>
                 <th>Stock Mínimo</th>
+                <th>Stock Requerido</th>
                 <th>Proveedor</th>
                 <th>Precio Mayor</th>
                 <th>Precio Detal</th>
@@ -183,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </form>
                 </td>
                 <td>{{ producto.stock_minimo }}</td>
+                <td>{{ producto.stock_requerido }}</td>
                 <td>{{ producto.proveedor or '-' }}</td>
                 <td>
                     {% if producto.precio_mayor_bs or producto.precio_mayor_usd %}
@@ -305,6 +307,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="ms-2 text-muted small">(mín: {{ producto.stock_minimo }})</span>
                         </form>
                     </span>
+                </div>
+
+                {# Stock Requerido #}
+                <div class="data-item-mobile">
+                    <span class="data-label-mobile">Stock Req.</span>
+                    <span class="data-value-mobile">{{ producto.stock_requerido or '0' }}</span>
                 </div>
 
                 {# Proveedor #}

@@ -43,6 +43,7 @@ class ProductoForm(FlaskForm):
     ], validators=[Optional()])
     cantidad_stock = IntegerField('Cantidad en stock', validators=[DataRequired(), NumberRange(min=0)])
     stock_minimo = IntegerField('Stock mínimo', validators=[DataRequired(), NumberRange(min=1)])
+    stock_requerido = IntegerField('Stock requerido', validators=[Optional(), NumberRange(min=0)])
     proveedor = StringField('Proveedor', validators=[Optional(), Length(max=100)])
     modelos_compatibles = MultiCheckboxField('Modelos compatibles (solo para pantallas)', coerce=int, validators=[Optional()])
     

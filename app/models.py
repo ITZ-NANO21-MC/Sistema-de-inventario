@@ -13,6 +13,7 @@ class Producto(db.Model):
     marca = db.Column(db.String(50), nullable=True)
     cantidad_stock = db.Column(db.Integer, default=0)
     stock_minimo = db.Column(db.Integer, default=5)
+    stock_requerido = db.Column(db.Integer, default=0)
     proveedor = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
