@@ -13,6 +13,7 @@ if not exist "%BACKEND_DIR%" mkdir "%BACKEND_DIR%"
 REM Copiar archivos de la aplicacion Flask
 xcopy /E /I /Y "%PROJECT_ROOT%\app" "%BACKEND_DIR%\app"
 if exist "%PROJECT_ROOT%\Scripts" xcopy /E /I /Y "%PROJECT_ROOT%\Scripts" "%BACKEND_DIR%\Scripts" >nul
+if exist "%PROJECT_ROOT%\migrations" xcopy /E /I /Y "%PROJECT_ROOT%\migrations" "%BACKEND_DIR%\migrations" >nul
 copy /Y "%PROJECT_ROOT%\run.py" "%BACKEND_DIR%\run.py"
 copy /Y "%PROJECT_ROOT%\config.py" "%BACKEND_DIR%\config.py"
 copy /Y "%PROJECT_ROOT%\requirements.txt" "%BACKEND_DIR%\requirements.txt"
