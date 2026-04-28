@@ -29,6 +29,8 @@
                 <th>Categoría</th>
                 <th>Stock Actual</th>
                 <th>Mínimo Requerido</th>
+                <th>Stock Requerido</th>
+                <th>Faltante</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +41,11 @@
                 <td>{{ producto.categoria }}</td>
                 <td class="alert">{{ producto.cantidad_stock }}</td>
                 <td>{{ producto.stock_minimo }}</td>
+                <td>{{ producto.stock_requerido or 0 }}</td>
+                <td>
+                    {% set faltante = (producto.stock_requerido or 0) - producto.cantidad_stock %}
+                    {% if faltante > 0 %}{{ faltante }}{% else %}0{% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

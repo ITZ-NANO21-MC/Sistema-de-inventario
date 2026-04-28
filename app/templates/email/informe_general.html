@@ -171,6 +171,7 @@
                     <th>Categoría</th>
                     <th>Stock Actual</th>
                     <th>Stock Mínimo</th>
+                    <th>Stock Requerido</th>
                     <th>Proveedor</th>
                     <th>Estado</th>
                 </tr>
@@ -183,6 +184,7 @@
                     <td>{{ producto.categoria }}</td>
                     <td>{{ producto.cantidad_stock }}</td>
                     <td>{{ producto.stock_minimo }}</td>
+                    <td>{{ producto.stock_requerido or 0 }}</td>
                     <td>{{ producto.proveedor or '-' }}</td>
                     <td>
                         <span class="status-indicator 
@@ -210,7 +212,8 @@
                     <th>Nombre</th>
                     <th>Stock Actual</th>
                     <th>Stock Mínimo</th>
-                    <th>Diferencia</th>
+                    <th>Stock Requerido</th>
+                    <th>Faltante</th>
                 </tr>
             </thead>
             <tbody>
@@ -220,7 +223,11 @@
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.cantidad_stock }}</td>
                     <td>{{ producto.stock_minimo }}</td>
-                    <td>{{ producto.stock_minimo - producto.cantidad_stock }}</td>
+                    <td>{{ producto.stock_requerido or 0 }}</td>
+                    <td>
+                        {% set faltante = (producto.stock_requerido or 0) - producto.cantidad_stock %}
+                        {% if faltante > 0 %}{{ faltante }}{% else %}{{ producto.stock_minimo - producto.cantidad_stock }}{% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

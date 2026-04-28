@@ -30,6 +30,8 @@
                 <th>Categoría</th>
                 <th>Stock Actual</th>
                 <th>Stock Mínimo</th>
+                <th>Stock Requerido</th>
+                <th>Faltante</th>
                 <th>Proveedor</th>
                 <th>Última Notificación</th>
                 <th>Acciones</th>
@@ -45,6 +47,15 @@
                     <span class="badge bg-danger">{{ p.cantidad_stock }}</span>
                 </td>
                 <td>{{ p.stock_minimo }}</td>
+                <td>{{ p.stock_requerido or 0 }}</td>
+                <td>
+                    {% set faltante = (p.stock_requerido or 0) - p.cantidad_stock %}
+                    {% if faltante > 0 %}
+                        <span class="badge bg-warning text-dark">{{ faltante }}</span>
+                    {% else %}
+                        <span class="text-muted">0</span>
+                    {% endif %}
+                </td>
                 <td>{{ p.proveedor or '-' }}</td>
                 <td>
                     {% if p.ultima_notificacion %}
