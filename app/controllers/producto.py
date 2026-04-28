@@ -57,11 +57,16 @@ class ProductoController:
         if proveedor:
             query = query.filter(Producto.proveedor.ilike(f'%{proveedor}%'))
         
-        # Filtro por stock bajo/adecuado
+        # Filtro por stock bajo/adecuado/debajo de requerido
         if stock_bajo == 'si':
             query = query.filter(Producto.cantidad_stock <= Producto.stock_minimo)
         elif stock_bajo == 'no':
             query = query.filter(Producto.cantidad_stock > Producto.stock_minimo)
+        elif stock_bajo == 'requerido':
+            query = query.filter(
+                Producto.stock_requerido > 0,
+                Producto.cantidad_stock < Producto.stock_requerido
+            )
         
         # Filtro por rango de stock
         if stock_minimo is not None:

@@ -67,6 +67,7 @@
                     <option value="">Todos</option>
                     <option value="si" {% if request.args.get('stock_bajo') == 'si' %}selected{% endif %}>Stock Bajo</option>
                     <option value="no" {% if request.args.get('stock_bajo') == 'no' %}selected{% endif %}>Stock Adecuado</option>
+                    <option value="requerido" {% if request.args.get('stock_bajo') == 'requerido' %}selected{% endif %}>Debajo de Requerido</option>
                 </select>
             </div>
             <div class="col-12 col-sm-6 col-md-6">
@@ -184,7 +185,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     </form>
                 </td>
                 <td>{{ producto.stock_minimo }}</td>
-                <td>{{ producto.stock_requerido }}</td>
+                <td>
+                    {{ producto.stock_requerido or 0 }}
+                    {% set faltante = (producto.stock_requerido or 0) - producto.cantidad_stock %}
+                    {% if faltante > 0 %}
+                        <br><span class="badge bg-warning text-dark" title="Faltan {{ faltante }} unidades para alcanzar el stock requerido">
+                            <i class="fas fa-arrow-down"></i> {{ faltante }}
+                        </span>
+                    {% endif %}
+                </td>
                 <td>{{ producto.proveedor or '-' }}</td>
                 <td>
                     {% if producto.precio_mayor_bs or producto.precio_mayor_usd %}
@@ -312,7 +321,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 {# Stock Requerido #}
                 <div class="data-item-mobile">
                     <span class="data-label-mobile">Stock Req.</span>
-                    <span class="data-value-mobile">{{ producto.stock_requerido or '0' }}</span>
+                    <span class="data-value-mobile">
+                        {{ producto.stock_requerido or '0' }}
+                        {% set faltante = (producto.stock_requerido or 0) - producto.cantidad_stock %}
+                        {% if faltante > 0 %}
+                            <span class="badge bg-warning text-dark ms-1" title="Faltan {{ faltante }} unidades">
+                                <i class="fas fa-arrow-down"></i> {{ faltante }}
+                            </span>
+                        {% endif %}
+                    </span>
                 </div>
 
                 {# Proveedor #}
