@@ -7,6 +7,7 @@ from flask_login import LoginManager
 from flask_talisman import Talisman
 from config import Config
 import os
+import sys
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -52,7 +53,15 @@ def create_app(config_class=Config):
     with app.app_context():
         from flask_migrate import upgrade
         try:
-            upgrade()
+            # En modo PyInstaller, los archivos empaquetados se extraen a sys._MEIPASS.
+            # Flask-Migrate busca 'migrations/' relativo al CWD, no al directorio temporal,
+            # por lo que debemos indicarle la ruta correcta explícitamente.
+            if getattr(sys, 'frozen', False):
+                migrations_dir = os.path.join(sys._MEIPASS, 'migrations')
+            else:
+                migrations_dir = os.path.join(os.path.dirname(__file__), '..', 'migrations')
+            
+            upgrade(directory=migrations_dir)
             app.logger.info("Migraciones de base de datos comprobadas/aplicadas correctamente.")
         except Exception as e:
             app.logger.error(f"Error al aplicar migraciones automáticas: {e}")
