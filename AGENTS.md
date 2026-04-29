@@ -105,7 +105,16 @@ black --check app/ && isort --check-only app/ && flake8 app/  # Check all
 - Test both success and failure paths
 - Use `db` fixture for database lifecycle
 
+### Database Migrations
+- **Automated**: The app runs `flask db upgrade` automatically on startup (within `create_app`) to ensure the production database matches the bundled code.
+- **Manual**: Use `flask db migrate -m "description"` to create new migrations during development.
+
+### Stock Requirements
+- **Producto Model**: Includes `stock_minimo` (alert threshold) and `stock_requerido` (target level).
+- **Alerts**: Sent when `cantidad_stock <= stock_minimo`.
+- **Reports**: Include "Faltante" calculation (`stock_requerido - cantidad_stock`).
+
 ### Git
 - Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 - Feature branches, descriptive messages
-- Never commit secrets, `.env`, or `AGENTS.md`
+- Never commit secrets, `.env`, or `AGENTS.md` (except for structural changes)
