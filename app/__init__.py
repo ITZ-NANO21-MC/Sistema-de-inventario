@@ -51,33 +51,44 @@ def create_app(config_class=Config):
 
     # Aplicar migraciones automáticamente al inicio
     with app.app_context():
-        from flask_migrate import upgrade, stamp
         from sqlalchemy import inspect
         try:
-            # Determinar la ruta de migraciones según el entorno
+            # Garantizar que todas las tablas existan.
+            # create_all() es idempotente: si ya existen, no hace nada.
+            inspector = inspect(db.engine)
+            tablas_existentes = inspector.get_table_names()
+            
+            if not tablas_existentes or 'productos' not in tablas_existentes:
+                app.logger.info("Base de datos nueva detectada. Creando esquema completo...")
+                # Importar modelos para que SQLAlchemy conozca las tablas
+                from app import models  # noqa: F401
+                db.create_all()
+                app.logger.info("Esquema de base de datos creado correctamente.")
+        except Exception as e:
+            app.logger.error(f"Error al crear esquema de base de datos: {e}")
+
+        # Intentar aplicar/registrar migraciones (no crítico para el arranque)
+        try:
+            from flask_migrate import upgrade, stamp
+            
             if getattr(sys, 'frozen', False):
                 migrations_dir = os.path.join(sys._MEIPASS, 'migrations')
             else:
                 migrations_dir = os.path.join(os.path.dirname(__file__), '..', 'migrations')
             
-            # Verificar si la base de datos es nueva (sin tablas)
             inspector = inspect(db.engine)
             tablas_existentes = inspector.get_table_names()
             
-            if not tablas_existentes or 'productos' not in tablas_existentes:
-                # DB nueva: crear todas las tablas desde los modelos y marcar
-                # la migración en HEAD para que no intente ALTER sobre lo que
-                # acaba de crear.
-                app.logger.info("Base de datos nueva detectada. Creando esquema completo...")
-                db.create_all()
+            if 'alembic_version' not in tablas_existentes:
+                # DB recién creada: marcar migraciones como aplicadas
                 stamp(directory=migrations_dir)
-                app.logger.info("Esquema creado y migraciones marcadas en HEAD.")
+                app.logger.info("Migraciones marcadas en HEAD.")
             else:
-                # DB existente: aplicar migraciones pendientes normalmente
+                # DB existente: aplicar migraciones pendientes
                 upgrade(directory=migrations_dir)
-                app.logger.info("Migraciones de base de datos comprobadas/aplicadas correctamente.")
+                app.logger.info("Migraciones comprobadas/aplicadas correctamente.")
         except Exception as e:
-            app.logger.error(f"Error al aplicar migraciones automáticas: {e}")
+            app.logger.warning(f"Migraciones no aplicadas (no crítico): {e}")
 
     # Configuración de APScheduler
     scheduler.init_app(app)

@@ -25,6 +25,7 @@ a = Analysis(
         'smtplib',
         'sqlalchemy',
         'alembic',
+        'logging.config',  # necesario para Alembic (fileConfig)
         'tomli',           # necesario para alembic en Python < 3.11
         'pkg_resources',
         'dotenv',          # NOTA: es 'dotenv' en código, no 'python-dotenv'
