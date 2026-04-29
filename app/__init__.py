@@ -51,18 +51,31 @@ def create_app(config_class=Config):
 
     # Aplicar migraciones automáticamente al inicio
     with app.app_context():
-        from flask_migrate import upgrade
+        from flask_migrate import upgrade, stamp
+        from sqlalchemy import inspect
         try:
-            # En modo PyInstaller, los archivos empaquetados se extraen a sys._MEIPASS.
-            # Flask-Migrate busca 'migrations/' relativo al CWD, no al directorio temporal,
-            # por lo que debemos indicarle la ruta correcta explícitamente.
+            # Determinar la ruta de migraciones según el entorno
             if getattr(sys, 'frozen', False):
                 migrations_dir = os.path.join(sys._MEIPASS, 'migrations')
             else:
                 migrations_dir = os.path.join(os.path.dirname(__file__), '..', 'migrations')
             
-            upgrade(directory=migrations_dir)
-            app.logger.info("Migraciones de base de datos comprobadas/aplicadas correctamente.")
+            # Verificar si la base de datos es nueva (sin tablas)
+            inspector = inspect(db.engine)
+            tablas_existentes = inspector.get_table_names()
+            
+            if not tablas_existentes or 'productos' not in tablas_existentes:
+                # DB nueva: crear todas las tablas desde los modelos y marcar
+                # la migración en HEAD para que no intente ALTER sobre lo que
+                # acaba de crear.
+                app.logger.info("Base de datos nueva detectada. Creando esquema completo...")
+                db.create_all()
+                stamp(directory=migrations_dir)
+                app.logger.info("Esquema creado y migraciones marcadas en HEAD.")
+            else:
+                # DB existente: aplicar migraciones pendientes normalmente
+                upgrade(directory=migrations_dir)
+                app.logger.info("Migraciones de base de datos comprobadas/aplicadas correctamente.")
         except Exception as e:
             app.logger.error(f"Error al aplicar migraciones automáticas: {e}")
 
